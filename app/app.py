@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QComboBox, QPushButton, QLineEdit, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QComboBox, QPushButton, QLineEdit, QWidget, QInputDialog
 from PyQt6.QtCore import Qt
 
 class MyMainWindow(QMainWindow):
@@ -23,9 +23,7 @@ class MyMainWindow(QMainWindow):
       layout = QHBoxLayout()
       layout.setAlignment(Qt.AlignmentFlag.AlignRight)
       label = QLabel('Model')
-      combo = QComboBox()
-      combo.addItem('Model 1')
-      combo.addItem('Model 2')
+      combo = ModelComboBox()
       layout.addWidget(label)
       layout.addWidget(combo)
       main_layout.addLayout(layout)
@@ -37,7 +35,8 @@ class MyMainWindow(QMainWindow):
       label = QLabel('Language')
       combo = QComboBox()
       combo.addItem('English')
-      combo.addItem('Spanish')
+      combo.addItem('Vietnamese')
+      combo.addItem('Auto')
       layout.addWidget(label)
       layout.addWidget(combo)
       main_layout.addLayout(layout)
@@ -49,6 +48,53 @@ class MyMainWindow(QMainWindow):
       button = QPushButton('Start')
       layout.addWidget(button)
       main_layout.addLayout(layout)
+
+class ModelComboBox(QComboBox):
+   def __init__(self, parent = None):
+      super().__init__(parent)
+      self.api_keys = {}
+      self.addItem('OpenAI Whisper: Tiny')
+      self.addItem('OpenAI Whisper: Base')
+      self.addItem('OpenAI Whisper: Medium')
+      self.addItem('OpenAI Whisper: Large')
+      self.addItem('OpenAI Whisper: Turbo')
+      self.addItem('DeepGram')
+      self.addItem('AssemblyAI')
+      self.currentTextChanged.connect(self.textChanged)
+   
+   # Overwrite
+   def textChanged(self, text):
+      api_needed = ['DeepGram', 'AssemblyAI']
+      if text in api_needed:
+         self.showAPIKeyInput(text)
+         self.loadAPI(text, self.api_keys)
+      else:
+         self.loadModel(text)
+   
+   def showAPIKeyInput(self, text):
+      if self.api_keys.get(text):
+         return
+      
+      dialog = QInputDialog(parent=self)
+      dialog.setInputMode(QInputDialog.InputMode.TextInput)
+      dialog.setWindowTitle('API Key?')
+      dialog.setLabelText('Please enter API Key')
+      while True:
+         dialog.exec()
+
+         if dialog.result() == 1 and dialog.textValue():
+            self.api_keys[text] = dialog.textValue()
+            print(f'API Key: {dialog.textValue()}')
+            break
+
+         dialog.setLabelText('Please enter a valid API Key')
+
+   def loadModel(self, text):
+      print(f'Loading model: {text}')
+
+   def loadAPI(self, text, api_key):
+      print(f'Loading API: {text} with API Key: {api_key[text]}')
+
 
 if __name__ == "__main__":
    app = QApplication(sys.argv)
