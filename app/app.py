@@ -1,8 +1,10 @@
 import sys
+import time
 import assemblyai as aai
+import faster_whisper
 from deepgram import DeepgramClient, DeepgramApiKeyError
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QComboBox, QPushButton, QScrollArea, QWidget, QInputDialog
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QRunnable, QThreadPool, pyqtSignal, QObject
 from utility import check_assemblyai_api_key, check_deepgram_api_key, load_wav2vec, load_whisper
 
 class MyMainWindow(QMainWindow):
@@ -73,13 +75,15 @@ class ModelComboBox(QComboBox):
       super().__init__(parent)
       self.api_keys = {}
       self.last_index = 0
-      self.addItem('OpenAI Whisper: Tiny')
-      self.addItem('OpenAI Whisper: Base')
-      self.addItem('OpenAI Whisper: Medium')
-      self.addItem('OpenAI Whisper: Large')
-      self.addItem('OpenAI Whisper: Turbo')
-      self.addItem('Facebook Wav2Vec: Base')
-      self.addItem('Facebook Wav2Vec: Large')
+      self.threadpool = QThreadPool()
+      self.model = None
+      self.addItem('OpenAI Whisper: tiny')
+      self.addItem('OpenAI Whisper: base')
+      self.addItem('OpenAI Whisper: medium')
+      self.addItem('OpenAI Whisper: large')
+      self.addItem('OpenAI Whisper: turbo')
+      self.addItem('Facebook Wav2Vec: base')
+      self.addItem('Facebook Wav2Vec: large')
       self.addItem('DeepGram')
       self.addItem('AssemblyAI')
       self.activated.connect(self.textChanged)
@@ -120,13 +124,16 @@ class ModelComboBox(QComboBox):
          dialog.setLabelText('Please enter a valid API Key')
 
    def loadModel(self, text):
-      if text.startswith('OpenAI Whisper'):
-         load_whisper(text.split(':')[-1].strip())
-      elif text.startswith('Facebook Wav2Vec'):
-         load_wav2vec(text.split(':')[-1].strip())
+      worker = ModelLoadThread(text)
+      self.threadpool.start(worker)
+      worker.signals.result.connect(self._loadModel)
 
+   def _loadModel(self, model):
+      self.model = model
+      print(f'Model loaded: {model}')
+      
    def loadAPI(self, text, api_key):
-      print(f'Loading API: {text} with API Key: {api_key[text]}')
+      print(f'Loading API: {text} with API Key:')
 
    def checkAPIKey(self, text, api_key):
       print(f'Checking API Key: {text}')
@@ -146,6 +153,26 @@ class LanguageComboBox(QComboBox):
    def textChanged(self, text):
       print(f'Language changed to: {text}')
 
+class ModelLoadThread(QRunnable):
+   def __init__(self, text):
+      super().__init__()
+      self.text = text
+      self.signals = ModelLoadSignal()
+
+   def run(self):
+      time.sleep(2)
+      if self.text.startswith('OpenAI Whisper'):
+         model = load_whisper(self.text.split(':')[-1].strip())
+         self.signals.result.emit(model)
+         self.signals.finished.emit()
+      elif self.text.startswith('Facebook Wav2Vec'):
+         model = load_wav2vec(self.text.split(':')[-1].strip())
+         self.signals.result.emit(model)
+         self.signals.finished.emit()
+
+class ModelLoadSignal(QObject):
+   finished = pyqtSignal()
+   result = pyqtSignal(object)
 
 if __name__ == "__main__":
    app = QApplication(sys.argv)
