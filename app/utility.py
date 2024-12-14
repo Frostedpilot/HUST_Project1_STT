@@ -39,3 +39,9 @@ def check_assemblyai_api_key(api_key):
     else:
         print('Unknown error')
         return False
+
+def load_whisper(model_size):
+    print(f'Loading OpenAI Whisper: {model_size}')
+
+def load_wav2vec(model_size):
+    print(f'Loading Facebook Wav2Vec: {model_size}')

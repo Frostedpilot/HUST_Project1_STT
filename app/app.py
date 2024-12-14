@@ -3,7 +3,7 @@ import assemblyai as aai
 from deepgram import DeepgramClient, DeepgramApiKeyError
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QComboBox, QPushButton, QScrollArea, QWidget, QInputDialog
 from PyQt6.QtCore import Qt
-from utility import check_assemblyai_api_key, check_deepgram_api_key
+from utility import check_assemblyai_api_key, check_deepgram_api_key, load_wav2vec, load_whisper
 
 class MyMainWindow(QMainWindow):
    def __init__(self, parent = None):
@@ -77,6 +77,8 @@ class ModelComboBox(QComboBox):
       self.addItem('OpenAI Whisper: Medium')
       self.addItem('OpenAI Whisper: Large')
       self.addItem('OpenAI Whisper: Turbo')
+      self.addItem('Facebook Wav2Vec: Base')
+      self.addItem('Facebook Wav2Vec: Large')
       self.addItem('DeepGram')
       self.addItem('AssemblyAI')
       self.currentTextChanged.connect(self.textChanged)
@@ -85,8 +87,8 @@ class ModelComboBox(QComboBox):
    def textChanged(self, text):
       api_needed = ['DeepGram', 'AssemblyAI']
       if text in api_needed:
-         self.showAPIKeyInput(text)
-         self.loadAPI(text, self.api_keys)
+         if self.showAPIKeyInput(text):
+            self.loadAPI(text, self.api_keys)
       else:
          self.loadModel(text)
    
@@ -104,12 +106,17 @@ class ModelComboBox(QComboBox):
          if dialog.result() == 1 and dialog.textValue():
             self.api_keys[text] = dialog.textValue()
             if self.checkAPIKey(text):
-               break
+               return True
+         elif dialog.result() == 0:
+            return False
 
          dialog.setLabelText('Please enter a valid API Key')
 
    def loadModel(self, text):
-      print(f'Loading model: {text}')
+      if text.startswith('OpenAI Whisper'):
+         load_whisper(text.split(':')[-1].strip())
+      elif text.startswith('Facebook Wav2Vec'):
+         load_wav2vec(text.split(':')[-1].strip())
 
    def loadAPI(self, text, api_key):
       print(f'Loading API: {text} with API Key: {api_key[text]}')
