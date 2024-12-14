@@ -1,8 +1,6 @@
 import sys
 import time
 import assemblyai as aai
-import faster_whisper
-from deepgram import DeepgramClient, DeepgramApiKeyError
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QComboBox, QPushButton, QScrollArea, QWidget, QInputDialog
 from PyQt6.QtCore import Qt, QRunnable, QThreadPool, pyqtSignal, QObject
 from utility import check_assemblyai_api_key, check_deepgram_api_key, load_wav2vec, load_whisper
