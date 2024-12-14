@@ -104,8 +104,9 @@ class ModelComboBox(QComboBox):
          dialog.exec()
 
          if dialog.result() == 1 and dialog.textValue():
-            self.api_keys[text] = dialog.textValue()
-            if self.checkAPIKey(text):
+            api_key = dialog.textValue()
+            if self.checkAPIKey(text, api_key):
+               self.api_keys[text] = api_key
                return True
          elif dialog.result() == 0:
             return False
@@ -121,12 +122,12 @@ class ModelComboBox(QComboBox):
    def loadAPI(self, text, api_key):
       print(f'Loading API: {text} with API Key: {api_key[text]}')
 
-   def checkAPIKey(self, text):
+   def checkAPIKey(self, text, api_key):
       print(f'Checking API Key: {text}')
       if text == 'DeepGram':
-         return check_deepgram_api_key(self.api_keys[text])
+         return check_deepgram_api_key(api_key)
       elif text == 'AssemblyAI':
-         return check_assemblyai_api_key(self.api_keys[text])
+         return check_assemblyai_api_key(api_key)
 
 class LanguageComboBox(QComboBox):
    def __init__(self, parent = None):
