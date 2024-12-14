@@ -72,6 +72,7 @@ class ModelComboBox(QComboBox):
    def __init__(self, parent = None):
       super().__init__(parent)
       self.api_keys = {}
+      self.last_index = 0
       self.addItem('OpenAI Whisper: Tiny')
       self.addItem('OpenAI Whisper: Base')
       self.addItem('OpenAI Whisper: Medium')
@@ -89,12 +90,16 @@ class ModelComboBox(QComboBox):
       if text in api_needed:
          if self.showAPIKeyInput(text):
             self.loadAPI(text, self.api_keys)
+         else:
+            self.setCurrentIndex(self.last_index)
       else:
          self.loadModel(text)
+
+      self.last_index = self.currentIndex()
    
    def showAPIKeyInput(self, text):
       if self.api_keys.get(text):
-         return
+         return True
       
       dialog = QInputDialog(parent=self)
       dialog.setInputMode(QInputDialog.InputMode.TextInput)
