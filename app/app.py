@@ -82,10 +82,11 @@ class ModelComboBox(QComboBox):
       self.addItem('Facebook Wav2Vec: Large')
       self.addItem('DeepGram')
       self.addItem('AssemblyAI')
-      self.currentTextChanged.connect(self.textChanged)
+      self.activated.connect(self.textChanged)
    
    # Overwrite
-   def textChanged(self, text):
+   def textChanged(self, int):
+      text = self.currentText()
       api_needed = ['DeepGram', 'AssemblyAI']
       if text in api_needed:
          if self.showAPIKeyInput(text):
@@ -95,7 +96,7 @@ class ModelComboBox(QComboBox):
       else:
          self.loadModel(text)
 
-      self.last_index = self.currentIndex()
+      self.last_index = int
    
    def showAPIKeyInput(self, text):
       if self.api_keys.get(text):
