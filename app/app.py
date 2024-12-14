@@ -3,6 +3,7 @@ import assemblyai as aai
 from deepgram import DeepgramClient, DeepgramApiKeyError
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QComboBox, QPushButton, QScrollArea, QWidget, QInputDialog
 from PyQt6.QtCore import Qt
+from utility import check_assemblyai_api_key, check_deepgram_api_key
 
 class MyMainWindow(QMainWindow):
    def __init__(self, parent = None):
@@ -116,27 +117,9 @@ class ModelComboBox(QComboBox):
    def checkAPIKey(self, text):
       print(f'Checking API Key: {text}')
       if text == 'DeepGram':
-         try:
-            # Check if the API key is valid
-            DeepgramClient(api_key=self.api_keys[text])
-         except DeepgramApiKeyError:
-            return False
-         except Exception as e:
-            print('Unexpected error:', e)
-            return False
-         else:
-            return True
+         return check_deepgram_api_key(self.api_keys[text])
       elif text == 'AssemblyAI':
-         try:
-            aai.settings.api_key = self.api_keys[text]
-            aai.Transcriber()
-         except aai.AssemblyAIError:
-            return False
-         except Exception as e:
-            print('Unexpected error:', e)
-            return False
-         else:
-            return True
+         return check_assemblyai_api_key(self.api_keys[text])
 
 class LanguageComboBox(QComboBox):
    def __init__(self, parent = None):
