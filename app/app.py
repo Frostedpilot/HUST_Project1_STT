@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import (
     QRadioButton,
     QFileDialog,
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QThreadPool
 from ModelComboBox import ModelComboBox
 from LanguageComboBox import LanguageComboBox
 from utility import (
@@ -20,6 +20,8 @@ from utility import (
     transcribe_wav2vec,
     transcribe_deepgram,
     transcribe_assemblyai,
+    TranscribeThread,
+    TranscribeSignal,
 )
 from deepgram import DeepgramClient
 import assemblyai as aai
@@ -32,6 +34,7 @@ class MyMainWindow(QMainWindow):
         self.model = None
         self.language_dict = {"English": "en", "Vietnamese": "vi", "Auto": None}
         self.clients = {"DeepGram": None, "AssemblyAI": None}
+        self.threadpool = QThreadPool()
 
         # The main scene
         main_widget = QWidget()
@@ -112,32 +115,32 @@ class MyMainWindow(QMainWindow):
     def transcribe(self):
         file_path = self.file_chooser_label.text()
         if not file_path:
-            self.transcript_text_edit.setPlainText("Please choose a file")
+            self.transcript_text_edit.setPlainText("Please choose a file first")
             return
         model_name = self.model_combobox.currentText()
-        if model_name == "DeepGram":
-            if not self.clients["DeepGram"]:
-                self.clients["DeepGram"] = DeepgramClient(
-                    api_key=self.model_combobox.api_keys["DeepGram"]
-                )
-            result = transcribe_deepgram(self.clients["DeepGram"], file_path)
-            self.transcript_text_edit.setPlainText(result)
-            return
-        elif model_name == "AssemblyAI":
-            if not self.clients["AssemblyAI"]:
-                aai.settings.api_key = self.model_combobox.api_keys["AssemblyAI"]
-                self.clients["AssemblyAI"] = aai.Transcriber()
-            result = transcribe_assemblyai(self.clients["AssemblyAI"], file_path)
-            self.transcript_text_edit.setPlainText(result)
+        if model_name in ["DeepGram", "AssemblyAI"]:
+            api_key = self.model_combobox.api_keys.get(model_name)
+            if not api_key:
+                self.transcript_text_edit.setPlainText("Please enter API Key first")
+                return
+        elif not self.model:
+            self.transcript_text_edit.setPlainText("Please choose a model first")
             return
         language = self.language_dict[self.language_combobox.currentText()]
-        if not self.model:
-            self.transcript_text_edit.setPlainText("Please choose a model")
+        if not language:
+            self.transcript_text_edit.setPlainText("Please choose a language first")
             return
-        if model_name.split(":")[0] == "OpenAI Whisper":
-            result = transcribe_whisper(self.model, file_path, language)
-        elif model_name.split(":")[0] == "Facebook Wav2Vec":
-            result = transcribe_wav2vec(self.model, file_path)
+        worker = TranscribeThread(
+            model_name=model_name,
+            model=self.model,
+            audio_path=file_path,
+            language=language,
+            clients=self.clients,
+        )
+        worker.signals.result.connect(self.transcript_result)
+        self.threadpool.start(worker)
+
+    def transcript_result(self, result):
         self.transcript_text_edit.setPlainText(result)
 
     def choose_file(self):

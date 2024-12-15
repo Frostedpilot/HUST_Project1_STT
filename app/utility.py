@@ -295,3 +295,39 @@ class ModelLoadThread(QRunnable):
 class ModelLoadSignal(QObject):
     finished = pyqtSignal()
     result = pyqtSignal(object)
+
+
+class TranscribeThread(QRunnable):
+    def __init__(self, model_name, model, audio_path, language, clients):
+        super().__init__()
+        self.model_name = model_name
+        self.model = model
+        self.audio_path = audio_path
+        self.signals = TranscribeSignal()
+        self.language = language
+        self.clients = clients
+        self.signals = TranscribeSignal()
+
+    def run(self):
+        if self.model_name.startswith("OpenAI Whisper"):
+            result = transcribe_whisper(self.model, self.audio_path, self.language)
+            self.signals.result.emit(result)
+            self.signals.finished.emit()
+        elif self.model_name.startswith("Facebook Wav2Vec"):
+            result = transcribe_wav2vec(self.model, self.audio_path)
+            self.signals.result.emit(result)
+            self.signals.finished.emit()
+        elif self.model_name == "DeepGram":
+            result = transcribe_deepgram(self.clients["DeepGram"], self.audio_path)
+            self.signals.result.emit(result)
+            self.signals.finished.emit()
+        elif self.model_name == "AssemblyAI":
+            result = transcribe_assemblyai(self.clients["AssemblyAI"], self.audio_path)
+            self.signals.result.emit(result)
+            self.signals.finished.emit()
+
+
+class TranscribeSignal(QObject):
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+    result = pyqtSignal(str)

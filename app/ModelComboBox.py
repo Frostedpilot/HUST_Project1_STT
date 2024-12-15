@@ -9,8 +9,11 @@ class ModelComboBox(QComboBox):
         super().__init__(parent)
         self.api_keys = {}
         self.last_index = 0
-        self.threadpool = QThreadPool()
         self.parent = parent
+        if self.parent:
+            self.threadpool = parent.threadpool
+        else:
+            self.threadpool = QThreadPool()
         self.model = None
         self.addItem("OpenAI Whisper: tiny")
         self.addItem("OpenAI Whisper: base")
@@ -60,8 +63,8 @@ class ModelComboBox(QComboBox):
 
     def loadModel(self, text):
         worker = ModelLoadThread(text)
-        self.threadpool.start(worker)
         worker.signals.result.connect(self._loadModel)
+        self.threadpool.start(worker)
 
     def _loadModel(self, model):
         self.parent.setModel(model)
