@@ -22,6 +22,14 @@ from deepgram import FileSource, PrerecordedOptions
 warnings.filterwarnings("ignore")
 
 
+def preprocess_audio(audio_path):
+    os.makedirs("res", exist_ok=True)
+    local_file = "res/audio.wav"
+    audio = AudioSegment.from_file(audio_path)
+    audio = audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
+    audio.export(local_file, format="wav")
+
+
 def check_deepgram_api_key(api_key):
     url = "https://api.deepgram.com/v1/auth/token"
     params = {"Authorization": f"Token {api_key}"}
@@ -87,7 +95,9 @@ def load_wav2vec(model_size):
         return model
 
 
-def transcribe_wav2vec(model, audio_path):
+def transcribe_wav2vec(model):
+    print("Transcribing using Facebook Wav2Vec")
+    audio_path = "res/audio.wav"
     model_path = "nguyenvulebinh/wav2vec2-bartpho"
     feature_extractor = AutoFeatureExtractor.from_pretrained(model_path)
     tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -217,7 +227,9 @@ def transcribe_wav2vec(model, audio_path):
     return result
 
 
-def transcribe_whisper(model, audio_path, language):
+def transcribe_whisper(model, language):
+    print("Transcribing using OpenAI Whisper")
+    audio_path = "res/audio.wav"
     try:
         result = ""
         # Transcribe the audio
@@ -230,8 +242,9 @@ def transcribe_whisper(model, audio_path, language):
     return result
 
 
-def transcribe_deepgram(client, audio_path):
-    print(f"Transcribing {audio_path} using Deepgram")
+def transcribe_deepgram(client):
+    print("Transcribing using Deepgram")
+    audio_path = "res/audio.wav"
     with open(audio_path, "rb") as file:
         buffer_data = file.read()
 
@@ -260,8 +273,9 @@ def transcribe_deepgram(client, audio_path):
     return transcription
 
 
-def transcribe_assemblyai(client, audio_path):
-    print(f"Transcribing {audio_path} using AssemblyAI")
+def transcribe_assemblyai(client):
+    print("Transcribing using AssemblyAI")
+    audio_path = "res/audio.wav"
     config = aai.TranscriptionConfig(language_code="vi")
     client.config = config
 
@@ -309,22 +323,24 @@ class TranscribeThread(QRunnable):
         self.signals = TranscribeSignal()
 
     def run(self):
+        preprocess_audio(self.audio_path)
         if self.model_name.startswith("OpenAI Whisper"):
-            result = transcribe_whisper(self.model, self.audio_path, self.language)
+            result = transcribe_whisper(self.model, self.language)
             self.signals.result.emit(result)
             self.signals.finished.emit()
         elif self.model_name.startswith("Facebook Wav2Vec"):
-            result = transcribe_wav2vec(self.model, self.audio_path)
+            result = transcribe_wav2vec(self.model)
             self.signals.result.emit(result)
             self.signals.finished.emit()
         elif self.model_name == "DeepGram":
-            result = transcribe_deepgram(self.clients["DeepGram"], self.audio_path)
+            result = transcribe_deepgram(self.clients["DeepGram"])
             self.signals.result.emit(result)
             self.signals.finished.emit()
         elif self.model_name == "AssemblyAI":
-            result = transcribe_assemblyai(self.clients["AssemblyAI"], self.audio_path)
+            result = transcribe_assemblyai(self.clients["AssemblyAI"])
             self.signals.result.emit(result)
             self.signals.finished.emit()
+        os.remove("res/audio.wav")
 
 
 class TranscribeSignal(QObject):

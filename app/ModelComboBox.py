@@ -2,6 +2,8 @@ import os
 from PyQt6.QtWidgets import QComboBox, QInputDialog
 from PyQt6.QtCore import QThreadPool
 from utility import check_assemblyai_api_key, check_deepgram_api_key, ModelLoadThread
+from deepgram import DeepgramClient
+import assemblyai as aai
 
 
 class ModelComboBox(QComboBox):
@@ -32,7 +34,7 @@ class ModelComboBox(QComboBox):
         api_needed = ["DeepGram", "AssemblyAI"]
         if text in api_needed:
             if self.showAPIKeyInput(text):
-                self.loadAPI(text, self.api_keys)
+                self.loadAPI(text, self.api_keys[text])
             else:
                 self.setCurrentIndex(self.last_index)
                 return
@@ -72,7 +74,11 @@ class ModelComboBox(QComboBox):
         print(f"Model loaded: {model}")
 
     def loadAPI(self, text, api_key):
-        print(f"Loading API: {text} with API Key:")
+        if text == "DeepGram":
+            self.parent.clients[text] = DeepgramClient(api_key)
+        elif text == "AssemblyAI":
+            aai.settings.api_key = api_key
+            self.parent.clients[text] = aai.Transcriber()
 
     def checkAPIKey(self, text, api_key):
         print(f"Checking API Key: {text}")
