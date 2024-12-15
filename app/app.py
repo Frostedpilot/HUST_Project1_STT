@@ -15,7 +15,14 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from ModelComboBox import ModelComboBox
 from LanguageComboBox import LanguageComboBox
-from utility import transcribe_whisper, transcribe_wav2vec
+from utility import (
+    transcribe_whisper,
+    transcribe_wav2vec,
+    transcribe_deepgram,
+    transcribe_assemblyai,
+)
+from deepgram import DeepgramClient
+import assemblyai as aai
 
 
 class MyMainWindow(QMainWindow):
@@ -24,6 +31,7 @@ class MyMainWindow(QMainWindow):
         self.setWindowTitle("App")
         self.model = None
         self.language_dict = {"English": "en", "Vietnamese": "vi", "Auto": None}
+        self.clients = {"DeepGram": None, "AssemblyAI": None}
 
         # The main scene
         main_widget = QWidget()
@@ -106,15 +114,27 @@ class MyMainWindow(QMainWindow):
         if not file_path:
             self.transcript_text_edit.setPlainText("Please choose a file")
             return
+        model_name = self.model_combobox.currentText()
+        if model_name == "DeepGram":
+            if not self.clients["DeepGram"]:
+                self.clients["DeepGram"] = DeepgramClient(
+                    api_key=self.model_combobox.api_keys["DeepGram"]
+                )
+            result = transcribe_deepgram(self.clients["DeepGram"], file_path)
+            self.transcript_text_edit.setPlainText(result)
+            return
+        elif model_name == "AssemblyAI":
+            if not self.clients["AssemblyAI"]:
+                aai.settings.api_key = self.model_combobox.api_keys["AssemblyAI"]
+                self.clients["AssemblyAI"] = aai.Transcriber()
+            result = transcribe_assemblyai(self.clients["AssemblyAI"], file_path)
+            self.transcript_text_edit.setPlainText(result)
+            return
+        language = self.language_dict[self.language_combobox.currentText()]
         if not self.model:
             self.transcript_text_edit.setPlainText("Please choose a model")
             return
-        language = self.language_dict[self.language_combobox.currentText()]
-        model_name = self.model_combobox.currentText()
-        if model_name in ["DeepGram", "AssemblyAI"]:
-            self.transcript_text_edit.setPlainText("Please enter API Key")
-            return
-        elif model_name.split(":")[0] == "OpenAI Whisper":
+        if model_name.split(":")[0] == "OpenAI Whisper":
             result = transcribe_whisper(self.model, file_path, language)
         elif model_name.split(":")[0] == "Facebook Wav2Vec":
             result = transcribe_wav2vec(self.model, file_path)

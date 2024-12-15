@@ -4,7 +4,9 @@ import torch
 import os
 import glob
 import re
+import json
 import torchaudio
+import assemblyai as aai
 from transformers import (
     SpeechEncoderDecoderModel,
     AutoFeatureExtractor,
@@ -15,6 +17,7 @@ from transformers import Wav2Vec2Model
 from faster_whisper import WhisperModel
 from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
 from pydub import AudioSegment
+from deepgram import FileSource, PrerecordedOptions
 
 warnings.filterwarnings("ignore")
 
@@ -225,6 +228,51 @@ def transcribe_whisper(model, audio_path, language):
         print(f"Error: {e}")
         result = "Error transcribing audio"
     return result
+
+
+def transcribe_deepgram(client, audio_path):
+    print(f"Transcribing {audio_path} using Deepgram")
+    with open(audio_path, "rb") as file:
+        buffer_data = file.read()
+
+    payload: FileSource = {
+        "buffer": buffer_data,
+    }
+
+    # STEP 2: Configure Deepgram options for audio analysis
+    options = PrerecordedOptions(
+        model="nova-2",
+        language="vi",
+        smart_format=True,
+    )
+
+    # STEP 3: Call the transcribe_file method with the text payload and options
+    response = client.listen.rest.v("1").transcribe_file(payload, options)
+
+    # STEP 4: Print the response
+    res_json = response.to_json(indent=4)
+    res_json = json.loads(res_json)
+
+    transcription = res_json["results"]["channels"][0]["alternatives"][0]["transcript"]
+    confidence = res_json["results"]["channels"][0]["alternatives"][0]["confidence"]
+    print(f"Transcription: {transcription}")
+    print(f"Confidence: {confidence}")
+    return transcription
+
+
+def transcribe_assemblyai(client, audio_path):
+    print(f"Transcribing {audio_path} using AssemblyAI")
+    config = aai.TranscriptionConfig(language_code="vi")
+    client.config = config
+
+    transcript = client.transcribe(audio_path)
+
+    if transcript.status == aai.TranscriptStatus.error:
+        print("Transcription failed: ", transcript.error)
+        return "Transcription failed"
+    else:
+        print(transcript.text)
+        return transcript.text
 
 
 class ModelLoadThread(QRunnable):
