@@ -35,6 +35,7 @@ class ModelComboBox(QComboBox):
                 self.loadAPI(text, self.api_keys)
             else:
                 self.setCurrentIndex(self.last_index)
+                return
         else:
             self.loadModel(text)
 
@@ -53,9 +54,9 @@ class ModelComboBox(QComboBox):
 
             if dialog.result() == 1 and dialog.textValue():
                 api_key = dialog.textValue()
-            if self.checkAPIKey(text, api_key):
-                self.api_keys[text] = api_key
-                return True
+                if self.checkAPIKey(text, api_key):
+                    self.api_keys[text] = api_key
+                    return True
             elif dialog.result() == 0:
                 return False
 

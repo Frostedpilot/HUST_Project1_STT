@@ -15,16 +15,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QThreadPool
 from ModelComboBox import ModelComboBox
 from LanguageComboBox import LanguageComboBox
-from utility import (
-    transcribe_whisper,
-    transcribe_wav2vec,
-    transcribe_deepgram,
-    transcribe_assemblyai,
-    TranscribeThread,
-    TranscribeSignal,
-)
-from deepgram import DeepgramClient
-import assemblyai as aai
+from utility import TranscribeThread
 
 
 class MyMainWindow(QMainWindow):
