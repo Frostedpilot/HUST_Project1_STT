@@ -5,6 +5,7 @@ import os
 import glob
 import re
 import json
+import httpx
 import torchaudio
 import assemblyai as aai
 from transformers import (
@@ -260,7 +261,9 @@ def transcribe_deepgram(client):
     )
 
     # STEP 3: Call the transcribe_file method with the text payload and options
-    response = client.listen.rest.v("1").transcribe_file(payload, options)
+    response = client.listen.rest.v("1").transcribe_file(
+        payload, options, timeout=httpx.Timeout(300, connect=10.0)
+    )
 
     # STEP 4: Print the response
     res_json = response.to_json(indent=4)
