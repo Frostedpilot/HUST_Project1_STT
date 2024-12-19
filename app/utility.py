@@ -23,6 +23,13 @@ from deepgram import FileSource, PrerecordedOptions
 warnings.filterwarnings("ignore")
 
 
+class APIError(Exception):
+    def __init__(self, message, code=None):
+        super().__init__(message)
+        self.message = message
+        self.code = code
+
+
 def preprocess_audio(audio_path):
     os.makedirs("res", exist_ok=True)
     local_file = "res/audio.wav"
@@ -34,43 +41,41 @@ def preprocess_audio(audio_path):
 def check_deepgram_api_key(api_key):
     url = "https://api.deepgram.com/v1/auth/token"
     params = {"Authorization": f"Token {api_key}"}
-    response = requests.get(url, headers=params)
+    try:
+        response = requests.get(url, headers=params)
+    except Exception:
+        raise APIError("Bad request", 400)
     if response.status_code == 200:
         print("Success!")
         return True
     elif response.status_code == 400:
-        print("Bad request")
-        return False
+        raise APIError("Bad request", response.status_code)
     elif response.status_code == 401:
-        print("Unauthorized")
-        return False
+        raise APIError("Unauthorized", response.status_code)
     elif response.status_code == 404:
-        print("Not found")
-        return False
+        raise APIError("Not found", response.status_code)
     else:
-        print("Unknown error")
-        return False
+        raise APIError("Unknown error", response.status_code)
 
 
 def check_assemblyai_api_key(api_key):
     url = "https://api.assemblyai.com/v2/transcript"
     params = {"Authorization": api_key}
-    response = requests.get(url, headers=params)
+    try:
+        response = requests.get(url, headers=params)
+    except:
+        raise APIError("Bad request")
     if response.status_code == 200:
         print("Success!")
         return True
     elif response.status_code == 400:
-        print("Bad request")
-        return False
+        raise APIError("Bad request", response.status_code)
     elif response.status_code == 401:
-        print("Unauthorized")
-        return False
+        raise APIError("Unauthorized", response.status_code)
     elif response.status_code == 404:
-        print("Not found")
-        return False
+        raise APIError("Not found", response.status_code)
     else:
-        print("Unknown error")
-        return False
+        raise APIError("Unknown error", response.status_code)
 
 
 def load_whisper(model_size):
@@ -96,7 +101,7 @@ def load_wav2vec(model_size):
         return model
 
 
-def transcribe_wav2vec(model):
+def transcribe_wav2vec(model, signals):
     print("Transcribing using Facebook Wav2Vec")
     audio_path = "res/audio.wav"
     model_path = "nguyenvulebinh/wav2vec2-bartpho"
@@ -197,9 +202,9 @@ def transcribe_wav2vec(model):
     # https://huggingface.co/nguyenvulebinh/wav2vec2-bartpho/resolve/main/sample_news.wav
     chunk_and_decode_wav(audio_path, "chunks")
     chunk_files = sorted(glob.glob("chunks/*.wav"))
-    result = ""
 
     for chunk_file in chunk_files:
+        result = ""
         # Load the chunk with torchaudio
         audio, sample_rate = torchaudio.load(chunk_file)
 
@@ -216,10 +221,12 @@ def transcribe_wav2vec(model):
 
         audio = audio.squeeze()  # Remove channel dimension
         transcription = decode_wav(audio, model)
+        print(transcription)
         pattern = [r"<\|\d+\.\d+\|", r"\|\d+\.\d+\|>"]
         for i in range(len(transcription)):
             fragment = re.sub("|".join(pattern), "", transcription[i])
             result += fragment
+        signals.segment_added.emit(result)
 
     # Clean up the chunks directory
     for chunk_file in chunk_files:
@@ -228,7 +235,7 @@ def transcribe_wav2vec(model):
     return result
 
 
-def transcribe_whisper(model, language):
+def transcribe_whisper(model, language, signals):
     print("Transcribing using OpenAI Whisper")
     audio_path = "res/audio.wav"
     try:
@@ -236,14 +243,14 @@ def transcribe_whisper(model, language):
         # Transcribe the audio
         segments, _ = model.transcribe(audio_path, vad_filter=True, language=language)
         for segment in segments:
-            result += f"{segment.text}\n"
+            signals.segment_added.emit(segment.text)
     except Exception as e:
-        print(f"Error: {e}")
-        result = "Error transcribing audio"
+        signals.error.emit(f"Error transcribing: {e}")
     return result
 
 
-def transcribe_deepgram(client):
+def transcribe_deepgram(client, language):
+    language_dict = {"Vietnamese": "vi", "English": "en", "Auto": None}
     print("Transcribing using Deepgram")
     audio_path = "res/audio.wav"
     with open(audio_path, "rb") as file:
@@ -256,9 +263,13 @@ def transcribe_deepgram(client):
     # STEP 2: Configure Deepgram options for audio analysis
     options = PrerecordedOptions(
         model="nova-2",
-        language="vi",
         smart_format=True,
     )
+
+    if language_dict[language]:
+        options.language = language_dict[language]
+    else:
+        options.detect_language = True
 
     # STEP 3: Call the transcribe_file method with the text payload and options
     response = client.listen.rest.v("1").transcribe_file(
@@ -276,10 +287,14 @@ def transcribe_deepgram(client):
     return transcription
 
 
-def transcribe_assemblyai(client):
+def transcribe_assemblyai(client, language):
+    language_dict = {"Vietnamese": "vi", "English": "en", "Auto": None}
     print("Transcribing using AssemblyAI")
     audio_path = "res/audio.wav"
-    config = aai.TranscriptionConfig(language_code="vi")
+    if language_dict[language]:
+        config = aai.TranscriptionConfig(language_code="vi")
+    else:
+        config = aai.TranscriptionConfig(language_detection=True)
     client.config = config
 
     transcript = client.transcribe(audio_path)
@@ -312,6 +327,7 @@ class ModelLoadThread(QRunnable):
 class ModelLoadSignal(QObject):
     finished = pyqtSignal()
     result = pyqtSignal(object)
+    error = pyqtSignal(str)
 
 
 class TranscribeThread(QRunnable):
@@ -328,19 +344,17 @@ class TranscribeThread(QRunnable):
     def run(self):
         preprocess_audio(self.audio_path)
         if self.model_name.startswith("OpenAI Whisper"):
-            result = transcribe_whisper(self.model, self.language)
-            self.signals.result.emit(result)
+            transcribe_whisper(self.model, self.language, self.signals)
             self.signals.finished.emit()
         elif self.model_name.startswith("Facebook Wav2Vec"):
-            result = transcribe_wav2vec(self.model)
-            self.signals.result.emit(result)
+            transcribe_wav2vec(self.model, self.signals)
             self.signals.finished.emit()
         elif self.model_name == "DeepGram":
-            result = transcribe_deepgram(self.clients["DeepGram"])
+            result = transcribe_deepgram(self.clients["DeepGram"], self.language)
             self.signals.result.emit(result)
             self.signals.finished.emit()
         elif self.model_name == "AssemblyAI":
-            result = transcribe_assemblyai(self.clients["AssemblyAI"])
+            result = transcribe_assemblyai(self.clients["AssemblyAI"], self.language)
             self.signals.result.emit(result)
             self.signals.finished.emit()
         os.remove("res/audio.wav")
@@ -350,3 +364,4 @@ class TranscribeSignal(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
     result = pyqtSignal(str)
+    segment_added = pyqtSignal(str)

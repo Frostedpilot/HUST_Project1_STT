@@ -166,3 +166,6 @@ cython_debug/
 
 # API keys
 secret.json
+
+# python env
+packenv/

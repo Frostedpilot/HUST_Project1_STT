@@ -89,9 +89,9 @@ class MyMainWindow(QMainWindow):
         main_layout = self.centralWidget().layout()
         layout = QHBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignRight)
-        button = QPushButton("Start")
-        button.clicked.connect(self.transcribe)
-        layout.addWidget(button)
+        self.transcribe_button = QPushButton("Start")
+        self.transcribe_button.clicked.connect(self.transcribe)
+        layout.addWidget(self.transcribe_button)
         main_layout.addLayout(layout)
 
     def add_transcript_output(self):
@@ -104,7 +104,10 @@ class MyMainWindow(QMainWindow):
         main_layout.addWidget(self.transcript_text_edit)
 
     def transcribe(self):
+        self.transcript_text_edit.setText("")
+
         file_path = self.file_chooser_label.text()
+        language = self.language_dict[self.language_combobox.currentText()]
         if not file_path:
             self.transcript_text_edit.setPlainText("Please choose a file first")
             return
@@ -117,7 +120,6 @@ class MyMainWindow(QMainWindow):
         elif not self.model:
             self.transcript_text_edit.setPlainText("Please choose a model first")
             return
-        language = self.language_dict[self.language_combobox.currentText()]
         if not language:
             self.transcript_text_edit.setPlainText("Please choose a language first")
             return
@@ -129,10 +131,23 @@ class MyMainWindow(QMainWindow):
             clients=self.clients,
         )
         worker.signals.result.connect(self.transcript_result)
+        worker.signals.finished.connect(self.reenable_button)
+        worker.signals.segment_added.connect(self.append_transcribe)
         self.threadpool.start(worker)
+
+        # Disable the start button
+        self.transcribe_button.setText("Transcribing...")
+        self.transcribe_button.setEnabled(False)
 
     def transcript_result(self, result):
         self.transcript_text_edit.setPlainText(result)
+
+    def reenable_button(self):
+        self.transcribe_button.setText("Start")
+        self.transcribe_button.setEnabled(True)
+
+    def append_transcribe(self, text):
+        self.transcript_text_edit.append(text + " ")
 
     def choose_file(self):
         dialog = QFileDialog()

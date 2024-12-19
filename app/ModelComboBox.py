@@ -1,7 +1,12 @@
 import os
-from PyQt6.QtWidgets import QComboBox, QInputDialog
+from PyQt6.QtWidgets import QComboBox, QInputDialog, QErrorMessage
 from PyQt6.QtCore import QThreadPool
-from utility import check_assemblyai_api_key, check_deepgram_api_key, ModelLoadThread
+from utility import (
+    check_assemblyai_api_key,
+    check_deepgram_api_key,
+    ModelLoadThread,
+    APIError,
+)
 from deepgram import DeepgramClient
 import assemblyai as aai
 
@@ -51,18 +56,28 @@ class ModelComboBox(QComboBox):
         dialog.setInputMode(QInputDialog.InputMode.TextInput)
         dialog.setWindowTitle("API Key?")
         dialog.setLabelText("Please enter API Key")
+
+        error_dialog = QErrorMessage(parent=self)
+        error_dialog.setWindowTitle("Error")
+        error_dialog.setModal(True)
         while True:
             dialog.exec()
 
-            if dialog.result() == 1 and dialog.textValue():
+            if dialog.result() == 1:
                 api_key = dialog.textValue()
-                if self.checkAPIKey(text, api_key):
-                    self.api_keys[text] = api_key
-                    return True
-            elif dialog.result() == 0:
+                try:
+                    self.checkAPIKey(text, api_key)
+                except APIError as e:
+                    if e.code == 401:
+                        dialog.setLabelText("Please enter a valid API Key")
+                    else:
+                        error_dialog.showMessage(f"Error: {e}")
+                        return False
+                    continue
+                self.api_keys[text] = api_key
+                return True
+            else:
                 return False
-
-            dialog.setLabelText("Please enter a valid API Key")
 
     def loadModel(self, text):
         worker = ModelLoadThread(text)
@@ -83,6 +98,6 @@ class ModelComboBox(QComboBox):
     def checkAPIKey(self, text, api_key):
         print(f"Checking API Key: {text}")
         if text == "DeepGram":
-            return check_deepgram_api_key(api_key)
+            check_deepgram_api_key(api_key)
         elif text == "AssemblyAI":
-            return check_assemblyai_api_key(api_key)
+            check_assemblyai_api_key(api_key)
