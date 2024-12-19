@@ -250,7 +250,6 @@ def transcribe_whisper(model, language, signals):
 
 
 def transcribe_deepgram(client, language):
-    language_dict = {"Vietnamese": "vi", "English": "en", "Auto": None}
     print("Transcribing using Deepgram")
     audio_path = "res/audio.wav"
     with open(audio_path, "rb") as file:
@@ -266,8 +265,8 @@ def transcribe_deepgram(client, language):
         smart_format=True,
     )
 
-    if language_dict[language]:
-        options.language = language_dict[language]
+    if language:
+        options.language = language
     else:
         options.detect_language = True
 
@@ -288,11 +287,10 @@ def transcribe_deepgram(client, language):
 
 
 def transcribe_assemblyai(client, language):
-    language_dict = {"Vietnamese": "vi", "English": "en", "Auto": None}
     print("Transcribing using AssemblyAI")
     audio_path = "res/audio.wav"
-    if language_dict[language]:
-        config = aai.TranscriptionConfig(language_code="vi")
+    if language:
+        config = aai.TranscriptionConfig(language_code=language)
     else:
         config = aai.TranscriptionConfig(language_detection=True)
     client.config = config

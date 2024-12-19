@@ -127,14 +127,16 @@ class FileChooseWidget(QWidget):
             self.youtube_link_label.setText(f"Error: {e}")
             return False
         else:
-            self.youtube_link_label.setText("Chosen YouTube link: " + url)
+            self.youtube_link_label.setText("<b>Chosen YouTube link</b>: " + url)
             self.file = "downloads/test.wav"
             return
 
     def flip_local_widget(self):
         self.lower_widget.setCurrentIndex(0)
         self.file = None
+        self.file_chooser_label.setText("No file chosen")
 
     def flip_youtube_widget(self):
         self.lower_widget.setCurrentIndex(1)
         self.file = None
+        self.youtube_link_label.setText("No link entered")

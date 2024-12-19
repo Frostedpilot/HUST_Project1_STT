@@ -81,13 +81,22 @@ class ModelComboBox(QComboBox):
                 return False
 
     def loadModel(self, text):
+        button = self.parent.transcribe_button
+        button.setEnabled(False)
+        button.setText("Loading Model...")
         worker = ModelLoadThread(text)
         worker.signals.result.connect(self._loadModel)
+        worker.signals.finished.connect(self._loadFinished)
         self.threadpool.start(worker)
 
     def _loadModel(self, model):
         self.parent.setModel(model)
         print(f"Model loaded: {model}")
+
+    def _loadFinished(self):
+        button = self.parent.transcribe_button
+        button.setEnabled(True)
+        button.setText("Start")
 
     def loadAPI(self, text, api_key):
         if text == "DeepGram":

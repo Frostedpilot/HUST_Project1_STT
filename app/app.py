@@ -8,9 +8,6 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QWidget,
     QTextEdit,
-    QButtonGroup,
-    QRadioButton,
-    QFileDialog,
 )
 from PyQt6.QtCore import Qt, QThreadPool
 from ModelComboBox import ModelComboBox
