@@ -16,6 +16,7 @@ from PyQt6.QtCore import Qt, QThreadPool
 from ModelComboBox import ModelComboBox
 from LanguageComboBox import LanguageComboBox
 from utility import TranscribeThread
+from FileChooseWidget import FileChooseWidget
 
 
 class MyMainWindow(QMainWindow):
@@ -37,7 +38,6 @@ class MyMainWindow(QMainWindow):
         self.add_model_combobox_part()
         self.add_language_combobox_part()
         self.add_input_selection()
-        self.add_file_chooser()
         self.add_buttons()
         self.add_transcript_output()
 
@@ -63,27 +63,8 @@ class MyMainWindow(QMainWindow):
 
     def add_input_selection(self):
         main_layout = self.centralWidget().layout()
-        layout = QHBoxLayout()
-        self.source_group = QButtonGroup()
-        # self.youtube_radio = QRadioButton("YouTube Link")
-        self.local_file_radio = QRadioButton("Local File")
-        # self.source_group.addButton(self.youtube_radio)
-        self.source_group.addButton(self.local_file_radio)
-        self.local_file_radio.setChecked(True)  # Default selection
-        # layout.addWidget(self.youtube_radio)
-        layout.addWidget(self.local_file_radio)
-        main_layout.addLayout(layout)
-
-    def add_file_chooser(self):
-        main_layout = self.centralWidget().layout()
-        layout = QHBoxLayout()
-        layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.file_chooser_button = QPushButton("Choose File")
-        self.file_chooser_button.clicked.connect(self.choose_file)
-        self.file_chooser_label = QLabel("No file chosen")
-        layout.addWidget(self.file_chooser_button)
-        layout.addWidget(self.file_chooser_label)
-        main_layout.addLayout(layout)
+        self.file_chooser_widget = FileChooseWidget()
+        main_layout.addWidget(self.file_chooser_widget)
 
     def add_buttons(self):
         main_layout = self.centralWidget().layout()
@@ -106,7 +87,7 @@ class MyMainWindow(QMainWindow):
     def transcribe(self):
         self.transcript_text_edit.setText("")
 
-        file_path = self.file_chooser_label.text()
+        file_path = self.file_chooser_widget.file
         language = self.language_dict[self.language_combobox.currentText()]
         if not file_path:
             self.transcript_text_edit.setPlainText("Please choose a file first")
@@ -148,23 +129,6 @@ class MyMainWindow(QMainWindow):
 
     def append_transcribe(self, text):
         self.transcript_text_edit.append(text + " ")
-
-    def choose_file(self):
-        dialog = QFileDialog()
-        dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
-        dialog.setNameFilters(
-            ["Audio files (*.wav *.mp3)", "Video files (*.mp4 *.mkv *.avi)"]
-        )
-        dialog.setViewMode(QFileDialog.ViewMode.List)
-        dialog.setOption(QFileDialog.Option.ReadOnly)
-        dialog.setWindowTitle("Choose a file")
-
-        if dialog.exec():
-            selected_files = dialog.selectedFiles()
-            if selected_files:
-                self.file_chooser_label.setText(selected_files[0])
-                return selected_files[0]
-        return None
 
     def setModel(self, model):
         self.model = model

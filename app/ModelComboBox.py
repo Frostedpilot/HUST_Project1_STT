@@ -22,6 +22,7 @@ class ModelComboBox(QComboBox):
         else:
             self.threadpool = QThreadPool()
         self.model = None
+
         self.addItem("OpenAI Whisper: tiny")
         self.addItem("OpenAI Whisper: base")
         self.addItem("OpenAI Whisper: medium")
