@@ -1,0 +1,87 @@
+/* General font and basic properties */
+QWidget {
+    font-family: "Segoe UI", sans-serif;
+    font-size: 10pt;
+}
+
+/* Button styles */
+QPushButton {
+    border: 1px solid #8f8f91;
+    border-radius: 4px;
+    padding: 5px 10px;
+}
+
+QPushButton:hover {
+    border-color: #5f5f61;
+}
+
+QPushButton:pressed {
+    background-color: #a9a9a9;
+}
+
+QPushButton:disabled {
+    color: #808080;
+    border-color: #a9a9a9;
+}
+
+/* ComboBox styles */
+QComboBox {
+    border: 1px solid #8f8f91;
+    border-radius: 4px;
+    padding: 5px;
+    selection-background-color: #5f5f61;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border-left: 1px solid #8f8f91;
+}
+
+/* LineEdit styles */
+QLineEdit {
+    border: 1px solid #8f8f91;
+    border-radius: 4px;
+    padding: 5px;
+    selection-background-color: #5f5f61;
+}
+
+/* TextEdit styles */
+QTextEdit {
+    border: 1px solid #8f8f91;
+    border-radius: 4px;
+    padding: 5px;
+    selection-background-color: #5f5f61;
+}
+
+/* Menu Bar styles */
+QMenuBar {
+    background-color: #5f5f61; /* Background color for the menu bar */
+    color: #dcdcdc; /* Text color for the menu bar */
+    border-bottom: 1px solid #8f8f91; /* Bottom border for the menu bar */
+}
+
+QMenuBar::item {
+    padding: 5px 10px; /* Padding for menu items */
+    background: transparent; /* No background for individual items */
+}
+
+QMenuBar::item:selected {
+    background-color: #8f8f91; /* Highlight color when an item is selected */
+}
+
+/* Menu styles */
+QMenu {
+    background-color: #5f5f61; /* Background color for menus */
+    border: 1px solid #8f8f91; /* Border for menus */
+}
+
+QMenu::item {
+    padding: 5px 20px; /* Padding for menu items */
+    color: #dcdcdc; /* Text color for menu items */
+}
+
+QMenu::item:selected {
+    background-color: #8f8f91; /* Highlight color for selected menu items */
+}

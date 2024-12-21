@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     QTextEdit,
     QSizePolicy,
 )
+from PyQt6.QtGui import QAction
 from PyQt6.QtCore import Qt, QThreadPool, QSize
 from ModelComboBox import ModelComboBox
 from LanguageComboBox import LanguageComboBox
@@ -21,6 +22,7 @@ class MyMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("App")
+        self.load_style("dark")
 
         # Initialize variables and objects needed for the app
         self.language_dict = {"English": "en", "Vietnamese": "vi", "Auto": None}
@@ -40,10 +42,41 @@ class MyMainWindow(QMainWindow):
         self.add_input_selection()
         self.add_buttons()
         self.add_transcript_output()
+        self.setup_menu()
 
         # Size policy for the main window
         main_layout.setSpacing(10)
         main_layout.setContentsMargins(10, 10, 10, 10)
+
+    def setup_menu(self):
+        # Create a "Theme" menu
+        self.theme_menu = self.menuBar().addMenu("&Theme")
+
+        # Dark theme action
+        self.dark_theme_action = QAction("&Dark Theme", self)
+        self.dark_theme_action.triggered.connect(lambda: self.load_style("dark"))
+        self.theme_menu.addAction(self.dark_theme_action)
+
+        # Light theme action
+        self.light_theme_action = QAction("&Light Theme", self)
+        self.light_theme_action.triggered.connect(lambda: self.load_style("light"))
+        self.theme_menu.addAction(self.light_theme_action)
+
+    def load_style(self, theme_name):
+        # Load common styles
+        with open("styles/common.qss", "r") as f:
+            common_style = f.read()
+
+        # Load theme-specific styles
+        try:
+            with open(f"styles/{theme_name}_theme.qss", "r") as f:
+                theme_style = f.read()
+        except FileNotFoundError:
+            print(f"Warning: Theme file not found: styles/{theme_name}_theme.qss")
+            theme_style = ""
+
+        # Apply the combined styles
+        self.setStyleSheet(common_style + theme_style)
 
     def add_model_combobox_part(self):
         main_layout = self.centralWidget().layout()
