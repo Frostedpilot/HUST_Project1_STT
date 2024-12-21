@@ -1,4 +1,5 @@
 import sys
+import os
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -191,4 +192,17 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MyMainWindow()
     window.show()
-    sys.exit(app.exec())
+    try:
+        code = app.exec()
+    except Exception as e:
+        print(e)
+
+    # Clean up all created folders during the app execution
+    import shutil
+
+    shutil.rmtree("res", ignore_errors=True)
+    shutil.rmtree("downloads", ignore_errors=True)
+    shutil.rmtree("chunks", ignore_errors=True)
+    if os.path.exists("speech.wav"):
+        os.remove("speech.wav")
+    sys.exit(code)
