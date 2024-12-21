@@ -203,6 +203,8 @@ def transcribe_wav2vec(model, signals):
     chunk_and_decode_wav(audio_path, "chunks")
     chunk_files = sorted(glob.glob("chunks/*.wav"))
 
+    res = ""
+
     for chunk_file in chunk_files:
         result = ""
         # Load the chunk with torchaudio
@@ -226,13 +228,15 @@ def transcribe_wav2vec(model, signals):
         for i in range(len(transcription)):
             fragment = re.sub("|".join(pattern), "", transcription[i])
             result += fragment
-        signals.segment_added.emit(result)
+        if signals:
+            signals.segment_added.emit(result)
+        res += result
 
     # Clean up the chunks directory
     for chunk_file in chunk_files:
         os.remove(chunk_file)
 
-    return result
+    return res
 
 
 def transcribe_whisper(model, language, signals):
@@ -243,9 +247,12 @@ def transcribe_whisper(model, language, signals):
         # Transcribe the audio
         segments, _ = model.transcribe(audio_path, vad_filter=True, language=language)
         for segment in segments:
-            signals.segment_added.emit(segment.text)
+            result += segment.text + " "
+            if signals:
+                signals.segment_added.emit(segment.text)
     except Exception as e:
-        signals.error.emit(f"Error transcribing: {e}")
+        if signals:
+            signals.error.emit(f"Error transcribing: {e}")
     return result
 
 
