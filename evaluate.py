@@ -203,7 +203,7 @@ def _evaluate_local(
                             preprocess_audio(audio_path)
                             if model_name == "OpenAI Whisper":
                                 hypothesis_text = transcribe_whisper(
-                                    model, language, signals=vad
+                                    model, language, signals=None, vad=vad
                                 )
                             elif model_name == "Facebook Wav2Vec":
                                 hypothesis_text = transcribe_wav2vec(
@@ -361,13 +361,15 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--vad",
-        type=bool,
+        type=str,
         help="Whether to use VAD for silence removal (default: False)",
-        default=True,
+        default="True",
         required=False,
     )
 
     args = parser.parse_args()
+
+    args.vad = args.vad.lower() == "true"
 
     evaluate_model(
         args.audio_dir,
