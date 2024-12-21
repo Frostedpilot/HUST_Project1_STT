@@ -1,0 +1,38 @@
+/* Dark theme colors */
+QWidget {
+    background-color: #2f2f2f;
+    color: #dcdcdc;
+}
+
+/* Specific widget overrides */
+QPushButton {
+    background-color: #3f3f3f;
+    color: #dcdcdc;
+}
+
+QComboBox {
+    background-color: #3f3f3f;
+    color: #dcdcdc;
+}
+
+QLineEdit {
+    background-color: #3f3f3f;
+    color: #dcdcdc;
+}
+
+QTextEdit {
+    background-color: #3f3f3f;
+    color: #dcdcdc;
+}
+
+QRadioButton {
+    color: #dcdcdc;
+}
+
+QLabel {
+    color: #dcdcdc;
+}
+
+QStatusBar {
+    color: #dcdcdc;
+}

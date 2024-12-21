@@ -10,8 +10,9 @@ from PyQt6.QtWidgets import (
     QWidget,
     QFileDialog,
     QLineEdit,
+    QSizePolicy,
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor import list_extractors
 
@@ -43,8 +44,17 @@ class FileChooseWidget(QWidget):
         layout_local = QHBoxLayout()
         layout_local.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.file_chooser_button = QPushButton("Choose File")
+        self.file_chooser_button.setMinimumSize(100, 30)
+        self.file_chooser_button.setSizePolicy(
+            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum
+        )
         self.file_chooser_button.clicked.connect(self.choose_file)
         self.file_chooser_label = QLabel("No file chosen")
+        self.file_chooser_label.setMinimumSize(200, 30)
+        self.file_chooser_label.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
+        self.file_chooser_label.setWordWrap(True)
         layout_local.addWidget(self.file_chooser_button)
         layout_local.addWidget(self.file_chooser_label)
         local_file_widget.setLayout(layout_local)
@@ -54,7 +64,16 @@ class FileChooseWidget(QWidget):
         layout_youtube.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.youtube_link_input = QLineEdit()
         self.youtube_link_input.setPlaceholderText("Enter a YouTube link")
+        self.youtube_link_input.setMinimumSize(200, 30)
+        self.youtube_link_input.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum
+        )
         self.youtube_link_label = QLabel("No link entered")
+        self.youtube_link_label.setMinimumSize(200, 30)
+        self.youtube_link_label.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
+        self.youtube_link_label.setWordWrap(True)
         self.youtube_link_input.returnPressed.connect(self.test_yt_link)
         layout_youtube.addWidget(self.youtube_link_input)
         layout_youtube.addWidget(self.youtube_link_label)
@@ -69,6 +88,8 @@ class FileChooseWidget(QWidget):
         main_layout.addWidget(self.upper_widget)
         main_layout.addWidget(self.lower_widget)
         self.setLayout(main_layout)
+
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
     def choose_file(self):
         dialog = QFileDialog()

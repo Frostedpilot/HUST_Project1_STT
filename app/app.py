@@ -8,8 +8,10 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QWidget,
     QTextEdit,
+    QSizePolicy,
 )
-from PyQt6.QtCore import Qt, QThreadPool
+from PyQt6.QtGui import QAction
+from PyQt6.QtCore import Qt, QThreadPool, QSize
 from ModelComboBox import ModelComboBox
 from LanguageComboBox import LanguageComboBox
 from utility import TranscribeThread
@@ -20,8 +22,11 @@ class MyMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("App")
-        self.model = None
+        self.load_style("dark")
+
+        # Initialize variables and objects needed for the app
         self.language_dict = {"English": "en", "Vietnamese": "vi", "Auto": None}
+        self.model = None
         self.clients = {"DeepGram": None, "AssemblyAI": None}
         self.threadpool = QThreadPool()
 
@@ -37,13 +42,53 @@ class MyMainWindow(QMainWindow):
         self.add_input_selection()
         self.add_buttons()
         self.add_transcript_output()
+        self.setup_menu()
+
+        # Size policy for the main window
+        main_layout.setSpacing(10)
+        main_layout.setContentsMargins(10, 10, 10, 10)
+
+    def setup_menu(self):
+        # Create a "Theme" menu
+        self.theme_menu = self.menuBar().addMenu("&Theme")
+
+        # Dark theme action
+        self.dark_theme_action = QAction("&Dark Theme", self)
+        self.dark_theme_action.triggered.connect(lambda: self.load_style("dark"))
+        self.theme_menu.addAction(self.dark_theme_action)
+
+        # Light theme action
+        self.light_theme_action = QAction("&Light Theme", self)
+        self.light_theme_action.triggered.connect(lambda: self.load_style("light"))
+        self.theme_menu.addAction(self.light_theme_action)
+
+    def load_style(self, theme_name):
+        # Load common styles
+        with open("styles/common.qss", "r") as f:
+            common_style = f.read()
+
+        # Load theme-specific styles
+        try:
+            with open(f"styles/{theme_name}_theme.qss", "r") as f:
+                theme_style = f.read()
+        except FileNotFoundError:
+            print(f"Warning: Theme file not found: styles/{theme_name}_theme.qss")
+            theme_style = ""
+
+        # Apply the combined styles
+        self.setStyleSheet(common_style + theme_style)
 
     def add_model_combobox_part(self):
         main_layout = self.centralWidget().layout()
         layout = QHBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignRight)
         label = QLabel("Model")
+        label.setMinimumSize(QSize(60, 30))
         self.model_combobox = ModelComboBox(parent=self)
+        self.model_combobox.setMinimumSize(QSize(200, 30))
+        self.model_combobox.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
         layout.addWidget(label)
         layout.addWidget(self.model_combobox)
         main_layout.addLayout(layout)
@@ -53,7 +98,12 @@ class MyMainWindow(QMainWindow):
         layout = QHBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignRight)
         label = QLabel("Language")
+        label.setMinimumSize(QSize(60, 30))
         self.language_combobox = LanguageComboBox()
+        self.language_combobox.setMinimumSize(QSize(200, 30))
+        self.language_combobox.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
         layout.addWidget(label)
         layout.addWidget(self.language_combobox)
         main_layout.addLayout(layout)
@@ -68,6 +118,7 @@ class MyMainWindow(QMainWindow):
         layout = QHBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.transcribe_button = QPushButton("Start")
+        self.transcribe_button.setMinimumSize(QSize(100, 30))
         self.transcribe_button.clicked.connect(self.transcribe)
         layout.addWidget(self.transcribe_button)
         main_layout.addLayout(layout)
@@ -79,6 +130,11 @@ class MyMainWindow(QMainWindow):
         self.transcript_text_edit.setLineWrapMode(
             QTextEdit.LineWrapMode.WidgetWidth
         )  # Enable word wrap
+        self.transcript_text_edit.setMinimumSize(QSize(400, 300))
+
+        self.transcript_text_edit.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
         main_layout.addWidget(self.transcript_text_edit)
 
     def transcribe(self):

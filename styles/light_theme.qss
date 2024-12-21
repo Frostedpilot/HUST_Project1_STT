@@ -1,0 +1,38 @@
+/* Light theme colors */
+QWidget {
+    background-color: #f0f0f0;
+    color: #202020;
+}
+
+/* Specific widget overrides */
+QPushButton {
+    background-color: #e0e0e0;
+    color: #202020;
+}
+
+QComboBox {
+    background-color: #e0e0e0;
+    color: #202020;
+}
+
+QLineEdit {
+    background-color: #e0e0e0;
+    color: #202020;
+}
+
+QTextEdit {
+    background-color: #e0e0e0;
+    color: #202020;
+}
+
+QRadioButton {
+    color: #202020;
+}
+
+QLabel {
+    color: #202020;
+}
+
+QStatusBar {
+    color: #202020;
+}
