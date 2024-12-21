@@ -169,3 +169,6 @@ secret.json
 
 # python env
 packenv/
+
+# the evaluation data
+data/
