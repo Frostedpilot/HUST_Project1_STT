@@ -14,6 +14,13 @@ from transformers import (
     AutoTokenizer,
     GenerationConfig,
 )
+from silero_vad import (
+    load_silero_vad,
+    read_audio,
+    get_speech_timestamps,
+    save_audio,
+    collect_chunks,
+)
 from transformers import Wav2Vec2Model
 from faster_whisper import WhisperModel
 from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
@@ -101,7 +108,7 @@ def load_wav2vec(model_size):
         return model
 
 
-def transcribe_wav2vec(model, signals):
+def transcribe_wav2vec(model, signals, vad=False):
     print("Transcribing using Facebook Wav2Vec")
     audio_path = "res/audio.wav"
     model_path = "nguyenvulebinh/wav2vec2-bartpho"
@@ -200,6 +207,33 @@ def transcribe_wav2vec(model, signals):
         print("Audio splitting complete.")
 
     # https://huggingface.co/nguyenvulebinh/wav2vec2-bartpho/resolve/main/sample_news.wav
+
+    if vad:
+        vad_model = load_silero_vad()
+        wav = read_audio(audio_path)
+        speech_timestamp = get_speech_timestamps(wav, vad_model)
+
+        # Get how many seconds of non-speech silero vad has detected
+        silero_vad_speech = 0
+        for i in range(len(speech_timestamp)):
+            silero_vad_speech += (
+                speech_timestamp[i]["end"] - speech_timestamp[i]["start"]
+            )
+
+        silero_vad_speech /= 16000  # sample rate
+
+        second = silero_vad_speech % 60
+        _minute = silero_vad_speech // 60
+        minute = _minute % 60
+        hour = _minute // 60
+
+        print(
+            f"Silero VAD detected {int(hour)} hours {int(minute)} minutes {int(second)} seconds of speech"
+        )
+
+        save_audio("speech.wav", collect_chunks(speech_timestamp, wav))
+        audio_path = "speech.wav"
+
     chunk_and_decode_wav(audio_path, "chunks")
     chunk_files = sorted(glob.glob("chunks/*.wav"))
 
@@ -239,13 +273,13 @@ def transcribe_wav2vec(model, signals):
     return res
 
 
-def transcribe_whisper(model, language, signals):
+def transcribe_whisper(model, language, signals, vad=True):
     print("Transcribing using OpenAI Whisper")
     audio_path = "res/audio.wav"
     try:
         result = ""
         # Transcribe the audio
-        segments, _ = model.transcribe(audio_path, vad_filter=True, language=language)
+        segments, _ = model.transcribe(audio_path, vad_filter=vad, language=language)
         for segment in segments:
             result += segment.text + " "
             if signals:

@@ -86,7 +86,7 @@ def evaluate_model(
     language,
     log_dir="evaluation_logs",
     model_size=None,
-    model=None,
+    vad=False,
 ):
     os.makedirs(log_dir, exist_ok=True)
 
@@ -150,6 +150,7 @@ def evaluate_model(
         log_dir,
         text_normalizer_wer,
         text_normalizer_cer,
+        vad,
     )
     _evaluate_api(
         models_to_evaluate["api"],
@@ -168,6 +169,7 @@ def _evaluate_local(
     log_dir,
     text_normalizer_wer,
     text_normalizer_cer,
+    vad,
 ):
     for model_name, model_sizes in models_to_evaluate.items():
         for model_size in model_sizes:
@@ -201,11 +203,11 @@ def _evaluate_local(
                             preprocess_audio(audio_path)
                             if model_name == "OpenAI Whisper":
                                 hypothesis_text = transcribe_whisper(
-                                    model, language, signals=None
+                                    model, language, signals=vad
                                 )
                             elif model_name == "Facebook Wav2Vec":
                                 hypothesis_text = transcribe_wav2vec(
-                                    model, signals=None
+                                    model, signals=None, vad=vad
                                 )
                             os.remove("res/audio.wav")
 
@@ -357,9 +359,21 @@ if __name__ == "__main__":
         help="Size of the model to load, only for whisper model (e.g., 'tiny', 'base', 'medium')",
         required=False,
     )
+    parser.add_argument(
+        "--vad",
+        type=bool,
+        help="Whether to use VAD for silence removal (default: False)",
+        default=True,
+        required=False,
+    )
 
     args = parser.parse_args()
 
     evaluate_model(
-        args.audio_dir, args.model_name, args.language, args.log_dir, args.model_size
+        args.audio_dir,
+        args.model_name,
+        args.language,
+        args.log_dir,
+        args.model_size,
+        args.vad,
     )
