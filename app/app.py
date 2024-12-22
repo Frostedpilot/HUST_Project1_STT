@@ -194,8 +194,8 @@ class MyMainWindow(QMainWindow):
             audio_path=file_path,
             language=language,
             clients=self.clients,
-            whisper_vad=self.settings.value("Whisper/vad"),
-            w2v_vad=self.settings.value("Wav2Vec/vad"),
+            whisper_vad=bool(self.settings.value("Whisper/vad")),
+            w2v_vad=bool(self.settings.value("Wav2Vec/vad")),
         )
         worker.signals.result.connect(self.transcript_result)
         worker.signals.finished.connect(self.reenable_button)
@@ -218,6 +218,9 @@ class MyMainWindow(QMainWindow):
 
     def setModel(self, model):
         self.model = model
+
+    def getClient(self, text):
+        return self.clients.get(text)
 
 
 if __name__ == "__main__":

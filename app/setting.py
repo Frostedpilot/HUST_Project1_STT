@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QLabel,
     QCheckBox,
+    QPushButton,
 )
 from PyQt6.QtCore import Qt
 from utility import check_assemblyai_api_key, check_deepgram_api_key
@@ -34,7 +35,6 @@ class SettingDialog(QDialog):
         whisper_vad_widget.setLayout(whisper_vad_layout)
         whisper_vad_label = QLabel("VAD:")
         self.whisper_vad = QCheckBox()
-        self.whisper_vad.checkStateChanged.connect(self.change_whisper_vad_setting)
         whisper_vad_layout.addWidget(whisper_vad_label)
         whisper_vad_layout.addWidget(self.whisper_vad)
         main_layout.addWidget(whisper_vad_widget)
@@ -47,7 +47,6 @@ class SettingDialog(QDialog):
         wav2vec_vad_widget.setLayout(wav2vec_vad_layout)
         wav2vec_vad_label = QLabel("VAD:")
         self.wav2vec_vad = QCheckBox()
-        self.wav2vec_vad.checkStateChanged.connect(self.change_w2v_vad_setting)
         wav2vec_vad_layout.addWidget(wav2vec_vad_label)
         wav2vec_vad_layout.addWidget(self.wav2vec_vad)
         main_layout.addWidget(wav2vec_vad_widget)
@@ -80,17 +79,29 @@ class SettingDialog(QDialog):
         self.assemblyai_api.returnPressed.connect(self._check_assemblyai_api_key)
         main_layout.addWidget(assemblyai_widget)
 
+        # Confirm, Cancel buttons
+        button_widget = QWidget()
+        button_layout = QHBoxLayout()
+        button_widget.setLayout(button_layout)
+        confirm_button = QPushButton("Confirm")
+        confirm_button.clicked.connect(self._accept)
+        cancel_button = QPushButton("Cancel")
+        cancel_button.clicked.connect(self.reject)
+        button_layout.addWidget(confirm_button)
+        button_layout.addWidget(cancel_button)
+        main_layout.addWidget(button_widget)
+
         self.load_settings()
 
     def load_settings(self):
         self.setting.beginGroup("Whisper")
-        whisper_vad = self.setting.value("vad")
+        whisper_vad = bool(self.setting.value("vad"))
         if whisper_vad:
             self.whisper_vad.setChecked(whisper_vad)
         self.setting.endGroup()
 
         self.setting.beginGroup("Wav2Vec")
-        w2v_vad = self.setting.value("vad")
+        w2v_vad = bool(self.setting.value("vad"))
         if w2v_vad:
             self.wav2vec_vad.setChecked(w2v_vad)
         self.setting.endGroup()
@@ -107,20 +118,45 @@ class SettingDialog(QDialog):
             self.assemblyai_api.setText(assemblyai_api_key)
         self.setting.endGroup()
 
-    def change_whisper_vad_setting(self, state):
-        state = True if state == Qt.CheckState.Checked else False
-        self.setting.setValue("Whisper/vad", state)
+    def _accept(self):
+        self.save_settings()
+        self.accept()
 
-    def change_w2v_vad_setting(self, state):
-        state = True if state == Qt.CheckState.Checked else False
-        self.setting.setValue("Wav2Vec/vad", state)
+    def save_settings(self):
+        self.setting.beginGroup("Whisper")
+        state = self.whisper_vad.isChecked()
+        state = 1 if state else 0
+        self.setting.setValue("vad", state)
+        self.setting.endGroup()
+
+        self.setting.beginGroup("Wav2Vec")
+        state = self.wav2vec_vad.isChecked()
+        state = 1 if state else 0
+        self.setting.setValue("vad", state)
+        self.setting.endGroup()
+
+        self.setting.beginGroup("DeepGram")
+        self.setting.setValue("api_key", self.deepgram_api.text())
+        if self.deepgram_api.text():
+            client = DeepgramClient(self.deepgram_api.text())
+            self.parent().clients["DeepGram"] = client
+        else:
+            self.parent().clients["DeepGram"] = None
+        self.setting.endGroup()
+
+        self.setting.beginGroup("AssemblyAI")
+        self.setting.setValue("api_key", self.assemblyai_api.text())
+        if self.assemblyai_api.text():
+            aai.settings.api_key = self.assemblyai_api.text()
+            client = aai.Transcriber()
+            self.parent().clients["AssemblyAI"] = client
+        else:
+            self.parent().clients["AssemblyAI"] = None
+        self.setting.endGroup()
 
     def _check_deepgram_api_key(self):
         api_key = self.deepgram_api.text()
         if check_deepgram_api_key(api_key):
-            self.setting.setValue("DeepGram/api_key", api_key)
-            client = DeepgramClient(api_key)
-            self.parent().clients["DeepGram"] = client
             return True
         self.deepgram_api.clear()
         return False
@@ -128,9 +164,6 @@ class SettingDialog(QDialog):
     def _check_assemblyai_api_key(self):
         api_key = self.assemblyai_api.text()
         if check_assemblyai_api_key(api_key):
-            self.setting.setValue("AssemblyAI/api_key", api_key)
-            aai.settings.api_key = api_key
-            self.parent().clients["AssemblyAI"] = aai.Transcriber()
             return True
         self.assemblyai_api.clear()
         return False

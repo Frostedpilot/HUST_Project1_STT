@@ -1,5 +1,5 @@
 import os
-from PyQt6.QtWidgets import QComboBox, QInputDialog, QErrorMessage
+from PyQt6.QtWidgets import QComboBox, QInputDialog, QErrorMessage, QLineEdit
 from PyQt6.QtCore import QThreadPool
 from utility import (
     check_assemblyai_api_key,
@@ -58,6 +58,7 @@ class ModelComboBox(QComboBox):
 
         dialog = QInputDialog(parent=self)
         dialog.setInputMode(QInputDialog.InputMode.TextInput)
+        dialog.setTextEchoMode(QLineEdit.EchoMode.Password)
         dialog.setWindowTitle("API Key?")
         dialog.setLabelText("Please enter API Key")
 
