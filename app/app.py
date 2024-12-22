@@ -15,12 +15,14 @@ from PyQt6.QtGui import QAction
 from PyQt6.QtCore import Qt, QThreadPool, QSize, QSettings
 from ModelComboBox import ModelComboBox
 from LanguageComboBox import LanguageComboBox
-from utility import TranscribeThread
+from utility import TranscribeThread, update_utility_base_dir
 from FileChooseWidget import FileChooseWidget
 from multiprocessing import freeze_support
 from setting import SettingDialog
 from deepgram import DeepgramClient
 import assemblyai as aai
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class MyMainWindow(QMainWindow):
@@ -35,6 +37,7 @@ class MyMainWindow(QMainWindow):
         self.clients = {"DeepGram": None, "AssemblyAI": None}
         self.threadpool = QThreadPool()
         self.settings = QSettings("Frostedpilot", "STT_app")
+        self.settings.setValue("BASE_DIR", BASE_DIR)
 
         # The main scene
         main_widget = QWidget()
@@ -95,12 +98,14 @@ class MyMainWindow(QMainWindow):
 
     def load_style(self, theme_name):
         # Load common styles
-        with open("styles/common.qss", "r") as f:
+        with open(os.path.join(BASE_DIR, "styles/common.qss"), "r") as f:
             common_style = f.read()
 
         # Load theme-specific styles
         try:
-            with open(f"styles/{theme_name}_theme.qss", "r") as f:
+            with open(
+                os.path.join(BASE_DIR, f"styles/{theme_name}_theme.qss"), "r"
+            ) as f:
                 theme_style = f.read()
         except FileNotFoundError:
             print(f"Warning: Theme file not found: styles/{theme_name}_theme.qss")
@@ -141,7 +146,7 @@ class MyMainWindow(QMainWindow):
 
     def add_input_selection(self):
         main_layout = self.centralWidget().layout()
-        self.file_chooser_widget = FileChooseWidget()
+        self.file_chooser_widget = FileChooseWidget(setting=self.settings, parent=self)
         main_layout.addWidget(self.file_chooser_widget)
 
     def add_buttons(self):
@@ -229,6 +234,7 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     window = MyMainWindow()
+    update_utility_base_dir(BASE_DIR)
     window.show()
     try:
         code = app.exec()
@@ -238,9 +244,9 @@ if __name__ == "__main__":
     # Clean up all created folders during the app execution
     import shutil
 
-    shutil.rmtree("res", ignore_errors=True)
-    shutil.rmtree("downloads", ignore_errors=True)
-    shutil.rmtree("chunks", ignore_errors=True)
-    if os.path.exists("speech.wav"):
-        os.remove("speech.wav")
+    shutil.rmtree(os.path.join(BASE_DIR, "res"), ignore_errors=True)
+    shutil.rmtree(os.path.join(BASE_DIR, "downloads"), ignore_errors=True)
+    shutil.rmtree(os.path.join(BASE_DIR, "chunks"), ignore_errors=True)
+    if os.path.exists(os.path.join(BASE_DIR, "speech.wav")):
+        os.remove(os.path.join(BASE_DIR, "speech.wav"))
     sys.exit(code)

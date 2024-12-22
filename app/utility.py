@@ -23,11 +23,17 @@ from silero_vad import (
 )
 from transformers import Wav2Vec2Model
 from faster_whisper import WhisperModel
-from PyQt6.QtCore import QRunnable, pyqtSignal, QObject
+from PyQt6.QtCore import QRunnable, pyqtSignal, QObject, QSettings
 from pydub import AudioSegment
 from deepgram import FileSource, PrerecordedOptions
+from yt_dlp import YoutubeDL
+from yt_dlp.extractor import list_extractors
 
 warnings.filterwarnings("ignore")
+
+settings = QSettings("Frostedpilot", "STT_app")
+BASE_DIR = settings.value("BASE_DIR")
+print("utility BASE DIR:", BASE_DIR)
 
 
 class APIError(Exception):
@@ -37,9 +43,15 @@ class APIError(Exception):
         self.code = code
 
 
+def update_utility_base_dir(new_base_dir):
+    global BASE_DIR
+    BASE_DIR = new_base_dir
+    print("BASE_DIR:", BASE_DIR)
+
+
 def preprocess_audio(audio_path):
-    os.makedirs("res", exist_ok=True)
-    local_file = "res/audio.wav"
+    os.makedirs(os.path.join(BASE_DIR, "res"), exist_ok=True)
+    local_file = os.path.join(BASE_DIR, "res/audio.wav")
     audio = AudioSegment.from_file(audio_path)
     audio = audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
     audio.export(local_file, format="wav")
@@ -110,7 +122,7 @@ def load_wav2vec(model_size):
 
 def transcribe_wav2vec(model, signals, vad=False):
     print("Transcribing using Facebook Wav2Vec")
-    audio_path = "res/audio.wav"
+    audio_path = os.path.join(BASE_DIR, "res/audio.wav")
     model_path = "nguyenvulebinh/wav2vec2-bartpho"
     feature_extractor = AutoFeatureExtractor.from_pretrained(model_path)
     tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -231,11 +243,13 @@ def transcribe_wav2vec(model, signals, vad=False):
             f"Silero VAD detected {int(hour)} hours {int(minute)} minutes {int(second)} seconds of speech"
         )
 
-        save_audio("speech.wav", collect_chunks(speech_timestamp, wav))
-        audio_path = "speech.wav"
+        save_audio(
+            os.path.join(BASE_DIR, "speech.wav"), collect_chunks(speech_timestamp, wav)
+        )
+        audio_path = os.path.join(BASE_DIR, "speech.wav")
 
-    chunk_and_decode_wav(audio_path, "chunks")
-    chunk_files = sorted(glob.glob("chunks/*.wav"))
+    chunk_and_decode_wav(audio_path, os.path.join(BASE_DIR, "chunks"))
+    chunk_files = sorted(glob.glob(os.path.join(BASE_DIR, "chunks/*.wav")))
 
     res = ""
 
@@ -275,7 +289,7 @@ def transcribe_wav2vec(model, signals, vad=False):
 
 def transcribe_whisper(model, language, signals, vad=True):
     print("Transcribing using OpenAI Whisper")
-    audio_path = "res/audio.wav"
+    audio_path = os.path.join(BASE_DIR, "res/audio.wav")
     try:
         result = ""
         # Transcribe the audio
@@ -292,7 +306,7 @@ def transcribe_whisper(model, language, signals, vad=True):
 
 def transcribe_deepgram(client, language):
     print("Transcribing using Deepgram")
-    audio_path = "res/audio.wav"
+    audio_path = os.path.join(BASE_DIR, "res/audio.wav")
     with open(audio_path, "rb") as file:
         buffer_data = file.read()
 
@@ -329,7 +343,7 @@ def transcribe_deepgram(client, language):
 
 def transcribe_assemblyai(client, language):
     print("Transcribing using AssemblyAI")
-    audio_path = "res/audio.wav"
+    audio_path = os.path.join(BASE_DIR, "res/audio.wav")
     if language:
         config = aai.TranscriptionConfig(language_code=language)
     else:
@@ -344,6 +358,51 @@ def transcribe_assemblyai(client, language):
     else:
         print(transcript.text)
         return transcript.text
+
+
+def download_yt_link(url):
+    os.makedirs(os.path.join(BASE_DIR, "downloads"), exist_ok=True)
+    path = os.path.join(BASE_DIR, "downloads/test")
+    ydl_opts = {
+        "format": "bestaudio/best",
+        "postprocessors": [
+            {
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "wav",
+            }
+        ],
+        "outtmpl": str(path),
+    }
+    try:
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+    except Exception as e:
+        print(e)
+        return None
+    else:
+        file = os.path.join(BASE_DIR, "downloads/test.wav")
+        return file
+
+
+class YoutubeDLThread(QRunnable):
+    def __init__(self, url):
+        super().__init__()
+        self.url = url
+        self.signals = YoutubeDLSignal()
+
+    def run(self):
+        file = download_yt_link(self.url)
+        self.signals.finished.emit()
+        if file:
+            self.signals.result.emit(file)
+        else:
+            self.signals.error.emit("Error downloading YouTube link")
+
+
+class YoutubeDLSignal(QObject):
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+    result = pyqtSignal(str)
 
 
 class ModelLoadThread(QRunnable):
@@ -409,7 +468,7 @@ class TranscribeThread(QRunnable):
             result = transcribe_assemblyai(self.clients["AssemblyAI"], self.language)
             self.signals.result.emit(result)
             self.signals.finished.emit()
-        os.remove("res/audio.wav")
+        os.remove(os.path.join(BASE_DIR, "res/audio.wav"))
 
 
 class TranscribeSignal(QObject):

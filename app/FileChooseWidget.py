@@ -15,12 +15,18 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QSize
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor import list_extractors
+from utility import YoutubeDLThread
 
 
 class FileChooseWidget(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, setting, parent=None):
         super().__init__(parent)
         self.file = None
+        self.setting = setting
+        if parent:
+            self.threadpool = parent.threadpool
+        self.BASE_DIR = self.setting.value("BASE_DIR")
+        print("FileChooseWidget BASE_DIR:", self.BASE_DIR)
 
         main_layout = QVBoxLayout()
 
@@ -130,27 +136,25 @@ class FileChooseWidget(QWidget):
         return False
 
     def download_yt_link(self, url):
-        os.makedirs("downloads", exist_ok=True)
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "postprocessors": [
-                {
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "wav",
-                }
-            ],
-            "outtmpl": "downloads/test.%(ext)s",
-        }
-        try:
-            with YoutubeDL(ydl_opts) as ydl:
-                ydl.download([url])
-        except Exception as e:
-            self.youtube_link_label.setText(f"Error: {e}")
-            return False
-        else:
-            self.youtube_link_label.setText("<b>Chosen YouTube link</b>: " + url)
-            self.file = "downloads/test.wav"
-            return
+        self.youtube_link_input.setPlaceholderText("Downloading...")
+        self.youtube_link_label.setText("Downloading...")
+        self.youtube_link_input.setDisabled(True)
+        worker = YoutubeDLThread(url)
+        worker.signals.result.connect(self._yt_download_finished)
+        worker.signals.error.connect(self._yt_download_failed)
+        worker.signals.finished.connect(
+            lambda: self.youtube_link_input.setDisabled(False)
+        )
+        self.threadpool.start(worker)
+
+    def _yt_download_finished(self, file):
+        self.file = file
+        self.youtube_link_label.setText("<b>Chosen YouTube link</b>: " + file)
+
+    def _yt_download_failed(self, error):
+        self.youtube_link_input.setText("")
+        self.youtube_link_input.setPlaceholderText("Error: " + error)
+        self.youtube_link_label.setText("No link entered")
 
     def flip_local_widget(self):
         self.lower_widget.setCurrentIndex(0)

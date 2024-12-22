@@ -15,6 +15,7 @@ class ModelComboBox(QComboBox):
     def __init__(self, setting, parent=None):
         super().__init__(parent)
         self.setting = setting
+        self.BASE_DIR = self.setting.value("BASE_DIR")
         self.last_index = 0
         self.parent = parent
         if self.parent:
