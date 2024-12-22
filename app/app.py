@@ -12,11 +12,15 @@ from PyQt6.QtWidgets import (
     QSizePolicy,
 )
 from PyQt6.QtGui import QAction
-from PyQt6.QtCore import Qt, QThreadPool, QSize
+from PyQt6.QtCore import Qt, QThreadPool, QSize, QSettings
 from ModelComboBox import ModelComboBox
 from LanguageComboBox import LanguageComboBox
 from utility import TranscribeThread
 from FileChooseWidget import FileChooseWidget
+from multiprocessing import freeze_support
+from setting import SettingDialog
+from deepgram import DeepgramClient
+import assemblyai as aai
 
 
 class MyMainWindow(QMainWindow):
@@ -30,6 +34,7 @@ class MyMainWindow(QMainWindow):
         self.model = None
         self.clients = {"DeepGram": None, "AssemblyAI": None}
         self.threadpool = QThreadPool()
+        self.settings = QSettings("Frostedpilot", "STT_app")
 
         # The main scene
         main_widget = QWidget()
@@ -48,6 +53,21 @@ class MyMainWindow(QMainWindow):
         # Size policy for the main window
         main_layout.setSpacing(10)
         main_layout.setContentsMargins(10, 10, 10, 10)
+        self.load_settings()
+
+    def load_settings(self):
+        self.settings.beginGroup("DeepGram")
+        deepgram_api_key = self.settings.value("api_key")
+        if deepgram_api_key:
+            self.clients["DeepGram"] = DeepgramClient(deepgram_api_key)
+        self.settings.endGroup()
+
+        self.settings.beginGroup("AssemblyAI")
+        assemblyai_api_key = self.settings.value("api_key")
+        if assemblyai_api_key:
+            aai.settings.api_key = assemblyai_api_key
+            self.clients["AssemblyAI"] = aai.Transcriber()
+        self.settings.endGroup()
 
     def setup_menu(self):
         # Create a "Theme" menu
@@ -62,6 +82,16 @@ class MyMainWindow(QMainWindow):
         self.light_theme_action = QAction("&Light Theme", self)
         self.light_theme_action.triggered.connect(lambda: self.load_style("light"))
         self.theme_menu.addAction(self.light_theme_action)
+
+        # Create a "Setting" menu
+        self.setting_menu = self.menuBar().addMenu("&Setting")
+        self.setting_action = QAction("&Setting", self)
+        self.setting_action.triggered.connect(self.open_setting)
+        self.setting_menu.addAction(self.setting_action)
+
+    def open_setting(self):
+        setting_dialog = SettingDialog(setting=self.settings, parent=self)
+        setting_dialog.exec()
 
     def load_style(self, theme_name):
         # Load common styles
@@ -85,7 +115,7 @@ class MyMainWindow(QMainWindow):
         layout.setAlignment(Qt.AlignmentFlag.AlignRight)
         label = QLabel("Model")
         label.setMinimumSize(QSize(60, 30))
-        self.model_combobox = ModelComboBox(parent=self)
+        self.model_combobox = ModelComboBox(setting=self.settings, parent=self)
         self.model_combobox.setMinimumSize(QSize(200, 30))
         self.model_combobox.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
@@ -164,6 +194,8 @@ class MyMainWindow(QMainWindow):
             audio_path=file_path,
             language=language,
             clients=self.clients,
+            whisper_vad=self.settings.value("Whisper/vad"),
+            w2v_vad=self.settings.value("Wav2Vec/vad"),
         )
         worker.signals.result.connect(self.transcript_result)
         worker.signals.finished.connect(self.reenable_button)
@@ -189,6 +221,9 @@ class MyMainWindow(QMainWindow):
 
 
 if __name__ == "__main__":
+    # Bug fix for multiprocessing on Windows when using PyInstaller
+    freeze_support()
+
     app = QApplication(sys.argv)
     window = MyMainWindow()
     window.show()

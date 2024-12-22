@@ -370,7 +370,16 @@ class ModelLoadSignal(QObject):
 
 
 class TranscribeThread(QRunnable):
-    def __init__(self, model_name, model, audio_path, language, clients):
+    def __init__(
+        self,
+        model_name,
+        model,
+        audio_path,
+        language,
+        clients,
+        whisper_vad=False,
+        w2v_vad=False,
+    ):
         super().__init__()
         self.model_name = model_name
         self.model = model
@@ -379,14 +388,18 @@ class TranscribeThread(QRunnable):
         self.language = language
         self.clients = clients
         self.signals = TranscribeSignal()
+        self.whisper_vad = whisper_vad
+        self.w2v_vad = w2v_vad
 
     def run(self):
         preprocess_audio(self.audio_path)
         if self.model_name.startswith("OpenAI Whisper"):
-            transcribe_whisper(self.model, self.language, self.signals)
+            transcribe_whisper(
+                self.model, self.language, self.signals, self.whisper_vad
+            )
             self.signals.finished.emit()
         elif self.model_name.startswith("Facebook Wav2Vec"):
-            transcribe_wav2vec(self.model, self.signals)
+            transcribe_wav2vec(self.model, self.signals, self.w2v_vad)
             self.signals.finished.emit()
         elif self.model_name == "DeepGram":
             result = transcribe_deepgram(self.clients["DeepGram"], self.language)

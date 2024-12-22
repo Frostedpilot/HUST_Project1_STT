@@ -12,9 +12,9 @@ import assemblyai as aai
 
 
 class ModelComboBox(QComboBox):
-    def __init__(self, parent=None):
+    def __init__(self, setting, parent=None):
         super().__init__(parent)
-        self.api_keys = {}
+        self.setting = setting
         self.last_index = 0
         self.parent = parent
         if self.parent:
@@ -38,19 +38,22 @@ class ModelComboBox(QComboBox):
     def textChanged(self, int):
         text = self.currentText()
         api_needed = ["DeepGram", "AssemblyAI"]
-        if text in api_needed:
+        if text in api_needed and not self.parent.clients[text]:
             if self.showAPIKeyInput(text):
-                self.loadAPI(text, self.api_keys[text])
+                self.loadAPI(text, self.setting.value(text + "/api_key"))
             else:
                 self.setCurrentIndex(self.last_index)
                 return
-        else:
+        elif text not in api_needed:
             self.loadModel(text)
 
         self.last_index = int
 
     def showAPIKeyInput(self, text):
-        if self.api_keys.get(text):
+        self.setting.beginGroup(text)
+        api_key = self.setting.value("api_key")
+        self.setting.endGroup()
+        if api_key:
             return True
 
         dialog = QInputDialog(parent=self)
@@ -75,7 +78,9 @@ class ModelComboBox(QComboBox):
                         error_dialog.showMessage(f"Error: {e}")
                         return False
                     continue
-                self.api_keys[text] = api_key
+                self.setting.beginGroup(text)
+                self.setting.setValue("api_key", api_key)
+                self.setting.endGroup()
                 return True
             else:
                 return False
