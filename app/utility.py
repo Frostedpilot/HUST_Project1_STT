@@ -1,4 +1,5 @@
 import requests
+import threading
 import warnings
 import torch
 import os
@@ -129,7 +130,7 @@ def load_wav2vec(model_size):
         return model
 
 
-def transcribe_wav2vec(model, signals, vad=False):
+def transcribe_wav2vec(model, signals, vad=False, stop_event=None):
     print("Transcribing using Facebook Wav2Vec")
     audio_path = os.path.join(BASE_DIR, "res/audio.wav")
     model_path = "nguyenvulebinh/wav2vec2-bartpho"
@@ -263,6 +264,8 @@ def transcribe_wav2vec(model, signals, vad=False):
     res = ""
 
     for chunk_file in chunk_files:
+        if stop_event and stop_event.is_set():
+            break
         result = ""
         # Load the chunk with torchaudio
         audio, sample_rate = torchaudio.load(chunk_file)
@@ -300,7 +303,7 @@ def transcribe_wav2vec(model, signals, vad=False):
     return res
 
 
-def transcribe_whisper(model, language, signals, vad=True):
+def transcribe_whisper(model, language, signals, vad=True, stop_event=None):
     print("Transcribing using OpenAI Whisper")
     audio_path = os.path.join(BASE_DIR, "res/audio.wav")
     try:
@@ -308,6 +311,10 @@ def transcribe_whisper(model, language, signals, vad=True):
         # Transcribe the audio
         segments, _ = model.transcribe(audio_path, vad_filter=vad, language=language)
         for segment in segments:
+            # Since python is short-circuiting, if stop_event is None, the second condition will not be evaluated, so no error will be raised
+            if stop_event and stop_event.is_set():
+                print("Transcription stopped")
+                break
             result += segment.text + " "
             if signals:
                 signals.segment_added.emit(segment.text)
@@ -317,6 +324,8 @@ def transcribe_whisper(model, language, signals, vad=True):
 
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
+
+    print("end")
 
     return result
 
@@ -466,16 +475,24 @@ class TranscribeThread(QRunnable):
         self.signals = TranscribeSignal()
         self.whisper_vad = whisper_vad
         self.w2v_vad = w2v_vad
+        self.stop_event = threading.Event()
+
+    def stop(self):
+        self.stop_event.set()
 
     def run(self):
         preprocess_audio(self.audio_path)
         if self.model_name.startswith("OpenAI Whisper"):
             transcribe_whisper(
-                self.model, self.language, self.signals, self.whisper_vad
+                self.model,
+                self.language,
+                self.signals,
+                self.whisper_vad,
+                self.stop_event,
             )
             self.signals.finished.emit()
         elif self.model_name.startswith("Facebook Wav2Vec"):
-            transcribe_wav2vec(self.model, self.signals, self.w2v_vad)
+            transcribe_wav2vec(self.model, self.signals, self.w2v_vad, self.stop_event)
             self.signals.finished.emit()
         elif self.model_name == "DeepGram":
             result = transcribe_deepgram(self.clients["DeepGram"], self.language)

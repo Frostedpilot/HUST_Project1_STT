@@ -36,6 +36,8 @@ class MyMainWindow(QMainWindow):
         self.model = None
         self.clients = {"DeepGram": None, "AssemblyAI": None}
         self.threadpool = QThreadPool()
+        self.worker = None
+        self.transcribing = False
         self.settings = QSettings("Frostedpilot", "STT_app")
         self.settings.setValue("BASE_DIR", BASE_DIR)
 
@@ -157,6 +159,11 @@ class MyMainWindow(QMainWindow):
         self.transcribe_button.setMinimumSize(QSize(100, 30))
         self.transcribe_button.clicked.connect(self.transcribe)
         layout.addWidget(self.transcribe_button)
+        self.stop_button = QPushButton("Stop")
+        self.stop_button.setMinimumSize(QSize(100, 30))
+        self.stop_button.clicked.connect(self.stop_transcribe)
+        self.stop_button.setEnabled(False)  # Initially disabled
+        layout.addWidget(self.stop_button)
         main_layout.addLayout(layout)
 
     def add_transcript_output(self):
@@ -193,7 +200,9 @@ class MyMainWindow(QMainWindow):
         if not language:
             self.transcript_text_edit.setPlainText("Please choose a language first")
             return
-        worker = TranscribeThread(
+
+        self.transcribing = True
+        self.worker = TranscribeThread(
             model_name=model_name,
             model=self.model,
             audio_path=file_path,
@@ -202,14 +211,30 @@ class MyMainWindow(QMainWindow):
             whisper_vad=bool(self.settings.value("Whisper/vad")),
             w2v_vad=bool(self.settings.value("Wav2Vec/vad")),
         )
-        worker.signals.result.connect(self.transcript_result)
-        worker.signals.finished.connect(self.reenable_button)
-        worker.signals.segment_added.connect(self.append_transcribe)
-        self.threadpool.start(worker)
+        self.worker.signals.result.connect(self.transcript_result)
+        self.worker.signals.finished.connect(self.reenable_button)
+        self.worker.signals.segment_added.connect(self.append_transcribe)
+        self.threadpool.start(self.worker)
 
         # Disable the start button
         self.transcribe_button.setText("Transcribing...")
         self.transcribe_button.setEnabled(False)
+        self.stop_button.setEnabled(True)
+        self.model_combobox.setEnabled(False)
+        self.language_combobox.setEnabled(False)
+        self.file_chooser_widget.setEnabled(False)
+
+    def stop_transcribe(self):
+        if self.transcribing:
+            print("Stopping transcription...")
+            self.transcribe_button.setText("Stopping...")
+            self.transcribe_button.setEnabled(False)
+
+            # Signal the worker thread to stop
+            if self.worker:
+                self.worker.stop()
+
+            self.transcribing = False
 
     def transcript_result(self, result):
         self.transcript_text_edit.setPlainText(result)
@@ -217,6 +242,10 @@ class MyMainWindow(QMainWindow):
     def reenable_button(self):
         self.transcribe_button.setText("Start")
         self.transcribe_button.setEnabled(True)
+        self.stop_button.setEnabled(False)
+        self.model_combobox.setEnabled(True)
+        self.language_combobox.setEnabled(True)
+        self.file_chooser_widget.setEnabled(True)
 
     def append_transcribe(self, text):
         self.transcript_text_edit.append(text + " ")
