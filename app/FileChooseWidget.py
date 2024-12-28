@@ -147,9 +147,9 @@ class FileChooseWidget(QWidget):
         )
         self.threadpool.start(worker)
 
-    def _yt_download_finished(self, file):
+    def _yt_download_finished(self, file, url):
         self.file = file
-        self.youtube_link_label.setText("<b>Chosen YouTube link</b>: " + file)
+        self.youtube_link_label.setText("<b>Chosen YouTube link</b>: " + url)
 
     def _yt_download_failed(self, error):
         self.youtube_link_input.setText("")

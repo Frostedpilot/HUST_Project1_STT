@@ -420,7 +420,7 @@ class YoutubeDLThread(QRunnable):
         file = download_yt_link(self.url)
         self.signals.finished.emit()
         if file:
-            self.signals.result.emit(file)
+            self.signals.result.emit(file, self.url)
         else:
             self.signals.error.emit("Error downloading YouTube link")
 
@@ -428,7 +428,7 @@ class YoutubeDLThread(QRunnable):
 class YoutubeDLSignal(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
-    result = pyqtSignal(str)
+    result = pyqtSignal(str, str)
 
 
 class ModelLoadThread(QRunnable):
