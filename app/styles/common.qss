@@ -57,31 +57,32 @@ QTextEdit {
 
 /* Menu Bar styles */
 QMenuBar {
-    background-color: #5f5f61; /* Background color for the menu bar */
-    color: #dcdcdc; /* Text color for the menu bar */
-    border-bottom: 1px solid #8f8f91; /* Bottom border for the menu bar */
+    border-bottom: 1px solid;
 }
 
 QMenuBar::item {
-    padding: 5px 10px; /* Padding for menu items */
-    background: transparent; /* No background for individual items */
+    padding: 5px 10px;
+    background: transparent;
 }
 
 QMenuBar::item:selected {
-    background-color: #8f8f91; /* Highlight color when an item is selected */
+    border-radius: 5px;
 }
 
 /* Menu styles */
 QMenu {
-    background-color: #5f5f61; /* Background color for menus */
-    border: 1px solid #8f8f91; /* Border for menus */
+    border: 1px solid;
 }
 
 QMenu::item {
-    padding: 5px 20px; /* Padding for menu items */
-    color: #dcdcdc; /* Text color for menu items */
+    padding: 5px 20px;
 }
 
 QMenu::item:selected {
-    background-color: #8f8f91; /* Highlight color for selected menu items */
+    border-radius: 5px;
+}
+
+/* Dialog styles */
+QDialog {
+    border: 1px solid;
 }

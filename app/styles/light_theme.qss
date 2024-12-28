@@ -36,3 +36,26 @@ QLabel {
 QStatusBar {
     color: #202020;
 }
+
+QMenuBar {
+    background-color: #f0f0f0;
+    color: #202020;
+    border-color: #8f8f91;
+}
+
+QMenuBar::item:selected {
+    background-color: #8f8f91;
+}
+
+QMenu {
+    background-color: #f0f0f0;
+    border-color: #8f8f91;
+}
+
+QMenu::item {
+    color: #202020;
+}
+
+QMenu::item:selected {
+    background-color: #8f8f91;
+}
