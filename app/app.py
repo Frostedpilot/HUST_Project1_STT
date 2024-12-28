@@ -197,9 +197,6 @@ class MyMainWindow(QMainWindow):
         elif not self.model:
             self.transcript_text_edit.setPlainText("Please choose a model first")
             return
-        if not language:
-            self.transcript_text_edit.setPlainText("Please choose a language first")
-            return
 
         self.transcribing = True
         self.worker = TranscribeThread(

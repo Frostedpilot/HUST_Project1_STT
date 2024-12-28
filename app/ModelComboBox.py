@@ -30,7 +30,6 @@ class ModelComboBox(QComboBox):
         self.addItem("OpenAI Whisper: large")
         self.addItem("OpenAI Whisper: turbo")
         self.addItem("Facebook Wav2Vec: vietnamese")
-        self.addItem("Facebook Wav2Vec: english")
         self.addItem("DeepGram")
         self.addItem("AssemblyAI")
         self.activated.connect(self.textChanged)
