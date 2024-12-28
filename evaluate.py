@@ -11,6 +11,7 @@ from app.utility import (
     transcribe_assemblyai,
     transcribe_deepgram,
     preprocess_audio,
+    update_utility_base_dir,
 )
 from deepgram import DeepgramClient
 import assemblyai as aai
@@ -121,23 +122,25 @@ def evaluate_model(
             },
         }
 
-    models_to_evaluate = {}
+    models_to_evaluate = {"local": {}, "api": {}}
     if model_name:
         if model_name in available_models["local"]:
-            if model_size and model_size in available_models[model_name]:
-                models_to_evaluate[model_name] = [model_size]
+            if model_size and model_size in available_models["local"][model_name]:
+                models_to_evaluate["local"][model_name] = [model_size]
             elif not model_size:
-                models_to_evaluate[model_name] = available_models[model_name]
+                models_to_evaluate["local"][model_name] = available_models["local"][
+                    model_name
+                ]
             else:
                 print(
-                    f"Invalid model size '{model_size}' for model '{model_name}'. Available sizes are: {available_models[model_name]}"
+                    f"Invalid model size '{model_size}' for model '{model_name}'. Available sizes are: {available_models["local"][model_name]}"
                 )
                 return
         elif model_name in available_models["api"]:
-            models_to_evaluate[model_name] = available_models["api"][model_name]
+            models_to_evaluate["api"][model_name] = available_models["api"][model_name]
         else:
             print(
-                f"Invalid model name: {model_name}. Available models are: {list(available_models.keys())}"
+                f"Invalid model name: {model_name}. Available models are: {list(available_models[i] for i in available_models.keys())}"
             )
             return
     else:
@@ -363,13 +366,16 @@ if __name__ == "__main__":
         "--vad",
         type=str,
         help="Whether to use VAD for silence removal (default: False)",
-        default="True",
+        default="False",
         required=False,
     )
 
     args = parser.parse_args()
 
     args.vad = args.vad.lower() == "true"
+
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    update_utility_base_dir(BASE_DIR)
 
     evaluate_model(
         args.audio_dir,

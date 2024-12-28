@@ -43,6 +43,13 @@ class APIError(Exception):
         self.code = code
 
 
+def update_cuda_device():
+    if torch.cuda.is_available():
+        settings.setValue("device", "cuda")
+    else:
+        settings.setValue("device", "cpu")
+
+
 def update_utility_base_dir(new_base_dir):
     global BASE_DIR
     BASE_DIR = new_base_dir
@@ -99,7 +106,9 @@ def check_assemblyai_api_key(api_key):
 
 def load_whisper(model_size):
     print(f"Loading OpenAI Whisper: {model_size}")
-    model = WhisperModel(model_size, device="cuda", compute_type="float16")
+    model = WhisperModel(
+        model_size, device=settings.value("device"), compute_type="float16"
+    )
     return model
 
 
@@ -271,7 +280,7 @@ def transcribe_wav2vec(model, signals, vad=False):
 
         audio = audio.squeeze()  # Remove channel dimension
         transcription = decode_wav(audio, model)
-        print(transcription)
+        # print(transcription)
         pattern = [r"<\|\d+\.\d+\|", r"\|\d+\.\d+\|>"]
         for i in range(len(transcription)):
             fragment = re.sub("|".join(pattern), "", transcription[i])
@@ -283,6 +292,10 @@ def transcribe_wav2vec(model, signals, vad=False):
     # Clean up the chunks directory
     for chunk_file in chunk_files:
         os.remove(chunk_file)
+
+    # clear cuda cache to avoid memory leak
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
     return res
 
@@ -301,6 +314,10 @@ def transcribe_whisper(model, language, signals, vad=True):
     except Exception as e:
         if signals:
             signals.error.emit(f"Error transcribing: {e}")
+
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
     return result
 
 
