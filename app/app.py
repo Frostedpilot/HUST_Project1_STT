@@ -15,7 +15,7 @@ from PyQt6.QtGui import QAction
 from PyQt6.QtCore import Qt, QThreadPool, QSize, QSettings
 from ModelComboBox import ModelComboBox
 from LanguageComboBox import LanguageComboBox
-from utility import TranscribeThread, update_utility_base_dir
+from utility import TranscribeThread, update_utility_base_dir, update_cuda_device
 from FileChooseWidget import FileChooseWidget
 from multiprocessing import freeze_support
 from setting import SettingDialog
@@ -235,6 +235,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MyMainWindow()
     update_utility_base_dir(BASE_DIR)
+    update_cuda_device()
     window.show()
     try:
         code = app.exec()
