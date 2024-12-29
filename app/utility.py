@@ -54,7 +54,7 @@ def update_cuda_device():
 def update_utility_base_dir(new_base_dir):
     global BASE_DIR
     BASE_DIR = new_base_dir
-    print("BASE_DIR:", BASE_DIR)
+    print("Updated utility BASE_DIR:", BASE_DIR)
 
 
 def preprocess_audio(audio_path):

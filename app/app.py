@@ -22,7 +22,10 @@ from setting import SettingDialog
 from deepgram import DeepgramClient
 import assemblyai as aai
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+    BASE_DIR = sys._MEIPASS
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class MyMainWindow(QMainWindow):
@@ -39,7 +42,12 @@ class MyMainWindow(QMainWindow):
         self.worker = None
         self.transcribing = False
         self.settings = QSettings("Frostedpilot", "STT_app")
-        self.settings.setValue("BASE_DIR", BASE_DIR)
+        if (
+            not self.settings.contains("BASE_DIR")
+            or self.settings.value("BASE_DIR") != BASE_DIR
+        ):
+            self.settings.setValue("BASE_DIR", BASE_DIR)
+            update_utility_base_dir(BASE_DIR)
 
         # The main scene
         main_widget = QWidget()
@@ -260,7 +268,6 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     window = MyMainWindow()
-    update_utility_base_dir(BASE_DIR)
     update_cuda_device()
     window.show()
     try:
