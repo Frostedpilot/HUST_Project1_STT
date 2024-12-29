@@ -20,7 +20,7 @@ This application is a speech-to-text (STT) system developed as part of the Proje
 - **Multiple Transcription Models:**
   - Local models:
     - OpenAI Whisper (various sizes: Tiny, Base, Medium, Large and Turbo)
-    - Facebook Wav2Vec 2.0 (Vietnamese model only for now)
+    - Facebook Wav2Vec 2.0 (only Vietnamese model for now)
   - API-based models:
     - Deepgram
     - AssemblyAI
@@ -45,6 +45,41 @@ This application is a speech-to-text (STT) system developed as part of the Proje
 #### Use the installer
 
 Simply download the installer from the release page and follow the instructions.
+
+#### Use the code directly
+
+1. **Clone the repository (or download the source code):**
+
+   ```bash
+   git clone https://github.com/Frostedpilot/HUST_Project1_STT.git
+   cd HUST_Project1_STT
+   ```
+
+   If you don't have Git, download the source code as a ZIP file and extract it.
+
+2. **Create and Activate a Virtual Environment (Recommended):**
+
+   ```bash
+   # Using venv (recommended)
+   python3 -m venv packenv
+   .venv\Scripts\activate
+
+   # Or using virtualenv (if you prefer)
+   pip install virtualenv
+   virtualenv packenv
+   .venv\Scripts\activate
+   ```
+
+3. **Install Dependencies:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Run the code**
+   ```bash
+   python3 app/app.py
+   ```
 
 #### Build from source
 
