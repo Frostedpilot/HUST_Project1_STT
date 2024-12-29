@@ -35,6 +35,9 @@ warnings.filterwarnings("ignore")
 settings = QSettings("Frostedpilot", "STT_app")
 BASE_DIR = settings.value("BASE_DIR")
 print("utility BASE DIR:", BASE_DIR)
+AudioSegment.converter = os.path.join(BASE_DIR, "binaries/ffmpeg.exe")
+AudioSegment.ffmpeg = os.path.join(BASE_DIR, "binaries/ffmpeg.exe")
+AudioSegment.ffprobe = os.path.join(BASE_DIR, "binaries/ffprobe.exe")
 
 
 class APIError(Exception):
@@ -391,6 +394,7 @@ def download_yt_link(url):
     path = os.path.join(BASE_DIR, "downloads/test")
     ydl_opts = {
         "format": "bestaudio/best",
+        "ffmpeg-location": os.path.join(BASE_DIR, "binaries/ffmpeg.exe"),
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",

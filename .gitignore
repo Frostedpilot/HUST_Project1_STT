@@ -172,3 +172,6 @@ packenv/
 
 # the evaluation data
 data/
+
+# local binary files
+app/binaries/
