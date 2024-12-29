@@ -13,9 +13,7 @@ datas.append(("app/styles", "./styles"))
 # binaries dependencies
 # ffmpeg related files
 binaries = []
-binaries.append(("app/binaries/ffmpeg.exe", '.'))
-binaries.append(("app/binaries/ffplay.exe", '.'))
-binaries.append(("app/binaries/ffprobe.exe", '.'))
+binaries.append(("app/binaries", './binaries'))
 
 
 a = Analysis(

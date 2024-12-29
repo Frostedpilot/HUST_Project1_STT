@@ -1,4 +1,5 @@
 import requests
+import samplerate
 import threading
 import warnings
 import torch
@@ -8,6 +9,7 @@ import re
 import json
 import httpx
 import torchaudio
+import soundfile as sf
 import assemblyai as aai
 from transformers import (
     SpeechEncoderDecoderModel,
@@ -25,19 +27,14 @@ from silero_vad import (
 from transformers import Wav2Vec2Model
 from faster_whisper import WhisperModel
 from PyQt6.QtCore import QRunnable, pyqtSignal, QObject, QSettings
-from pydub import AudioSegment
 from deepgram import FileSource, PrerecordedOptions
 from yt_dlp import YoutubeDL
-from yt_dlp.extractor import list_extractors
 
 warnings.filterwarnings("ignore")
 
 settings = QSettings("Frostedpilot", "STT_app")
 BASE_DIR = settings.value("BASE_DIR")
 print("utility BASE DIR:", BASE_DIR)
-AudioSegment.converter = os.path.join(BASE_DIR, "binaries/ffmpeg.exe")
-AudioSegment.ffmpeg = os.path.join(BASE_DIR, "binaries/ffmpeg.exe")
-AudioSegment.ffprobe = os.path.join(BASE_DIR, "binaries/ffprobe.exe")
 
 
 class APIError(Exception):
@@ -63,9 +60,17 @@ def update_utility_base_dir(new_base_dir):
 def preprocess_audio(audio_path):
     os.makedirs(os.path.join(BASE_DIR, "res"), exist_ok=True)
     local_file = os.path.join(BASE_DIR, "res/audio.wav")
-    audio = AudioSegment.from_file(audio_path)
-    audio = audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
-    audio.export(local_file, format="wav")
+    data, sr = sf.read(audio_path)
+    # Convert to mono (if needed) and resample to 16kHz
+    if data.ndim > 1:
+        data = data.mean(axis=1)
+    if sr != 16000:
+
+        ratio = 16000 / sr
+        data = samplerate.resample(data, ratio, "sinc_best")
+        sr = 16000
+
+    sf.write(local_file, data, sr, format="wav")
 
 
 def check_deepgram_api_key(api_key):
@@ -208,13 +213,12 @@ def transcribe_wav2vec(model, signals, vad=False, stop_event=None):
     # A function to split the wav into chunks of 20 seconds and then decode each chunk
 
     def chunk_and_decode_wav(input_file, output_dir, chunk_duration=20):
-        audio = AudioSegment.from_file(input_file)
 
-        # Convert to mono and set sample rate to 16kHz
-        audio = (
-            audio.set_channels(1).set_frame_rate(16000).set_sample_width(2)
-        )  # 2 bytes = 16-bit
-
+        data, samplerate = sf.read(input_file)
+        # Resample to 16kHz if necessary
+        if samplerate != 16000:
+            ratio = 16000 / samplerate
+            data = samplerate.resample(data, ratio, "sinc_best")
         # Get the audio duration in milliseconds
         audio_length = len(audio)
         chunk_length = chunk_duration * 1000  # Convert seconds to milliseconds
@@ -394,15 +398,16 @@ def download_yt_link(url):
     path = os.path.join(BASE_DIR, "downloads/test")
     ydl_opts = {
         "format": "bestaudio/best",
-        "ffmpeg-location": os.path.join(BASE_DIR, "binaries/ffmpeg.exe"),
         "postprocessors": [
             {
                 "key": "FFmpegExtractAudio",
                 "preferredcodec": "wav",
             }
         ],
+        "ffmpeg_location": os.path.join(BASE_DIR, "binaries"),
         "outtmpl": str(path),
     }
+    print(ydl_opts["ffmpeg_location"])
     try:
         with YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
