@@ -220,7 +220,7 @@ def transcribe_wav2vec(model, signals, vad=False, stop_event=None):
             ratio = 16000 / samplerate
             data = samplerate.resample(data, ratio, "sinc_best")
         # Get the audio duration in milliseconds
-        audio_length = len(audio)
+        audio_length = len(data)
         chunk_length = chunk_duration * 1000  # Convert seconds to milliseconds
 
         # Ensure the output directory exists
@@ -229,8 +229,8 @@ def transcribe_wav2vec(model, signals, vad=False, stop_event=None):
         # Split and save chunks
         for i, start_time in enumerate(range(0, audio_length, chunk_length)):
             end_time = min(start_time + chunk_length, audio_length)
-            chunk = audio[start_time:end_time]
-            chunk.export(f"{output_dir}/chunk_{i + 1}.wav", format="wav")
+            chunk = data[start_time:end_time]
+            sf.write(f"{output_dir}/chunk_{i + 1}.wav", chunk, samplerate, format="wav")
             print(f"Exported chunk {i + 1}: {start_time / 1000}s - {end_time / 1000}s")
 
         print("Audio splitting complete.")
