@@ -200,7 +200,7 @@ class MyMainWindow(QMainWindow):
             return
         model_name = self.model_combobox.currentText()
         if model_name in ["DeepGram", "AssemblyAI"]:
-            api_key = self.model_combobox.api_keys.get(model_name)
+            api_key = self.settings.value(f"{model_name}/api_key")
             if not api_key:
                 self.transcript_text_edit.setPlainText("Please enter API Key first")
                 return

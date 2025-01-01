@@ -1,0 +1,1063 @@
+ Chào các bạn, hôm nay chúng ta sẽ có bài kiểm tra giữa kỳ, tuy nhiên là chúng ta sẽ học một chút đã, sau đó thì chúng ta sẽ kiểm tra giữa kỳ sau. 
+ Thì buổi hôm trước chúng ta đang dừng ở cái phần hàng đợi, nhớ chúng ta nhớ lại thế nào là được gọi là cấu trúc dữ liệu hàng đợi. 
+ Thế thì về bản chất thì cái cấu trúc dữ liệu hàng đợi nó chính là một, cấu trúc hàng đợi nó chính là một cái cấu trúc mà được sử dụng để lưu trữ một tập các cái đối tượng. 
+ Và các cái đối tượng này được lưu trữ trong hàng đợi theo tính chất là FIFO, first in, first out, có nghĩa là cái phần tử nào mà được thêm vào trong hàng đợi trước thì sẽ được đưa ra khỏi hàng đợi trước. 
+ Ví dụ như hàng đợi của chúng ta chứa những người xếp hàng để thanh toán tiền ở siêu thị thì chúng ta thấy rõ ràng là khách hàng nào mà vào trong hàng đợi trước thì sẽ được đi ra hàng đợi trước. 
+ Vậy chúng ta nhớ tính chất của hàng đợi luôn luôn là FIFO, first in, first out, vào trước thì sẽ đi ra trước. 
+ Thế thì đối với hàng đợi thì chúng ta có hai cái thao tác chính đó là thêm một phần tử vào hàng đợi và xóa một phần tử khỏi hàng đợi. 
+ Thì rõ ràng vì nó hoạt động theo cái tính chất FIFO cho nên là thêm vào một phần tử vào trong cái hàng đợi thì chúng ta luôn luôn phải thêm vào phía cuối. 
+ Nếu như đây là đầu hàng đợi còn đây là cuối hàng đợi cuối hàng đợi thế thì khi thêm thì chúng ta sẽ luôn thêm vào cuối. 
+ Và cái thao tác thêm một phần tử vào hàng đợi thì người ta dùng là enqueue tức là thêm một phần tử vào trong hàng đợi. 
+ Và thêm thì luôn luôn thêm vào cuối. 
+ Và cái thao tác thứ hai đó là thao tác lấy một phần tử ra khỏi hàng đợi và chúng ta sẽ luôn luôn lấy phần tử đang đứng ở đầu hàng đợi ra khỏi nó. 
+ Và cái thao tác lấy một phần tử ra khỏi hàng đợi thì luôn luôn là Dequeue. 
+ Thế thì đấy là hai cái thao tác chính thêm và xóa một phần tử khỏi hàng đợi. 
+ Ngoài ra thì chúng ta có các cái thao tác bổ trợ ví dụ như là xác định xem là số lượng phần tử trong hàng đợi là bao nhiêu thông qua size của cái hàng đợi. 
+ is empty hay is full được sử dụng để xem là hàng đợi đang rỗng hay là hàng đợi đã đẩy. 
+ Và cái hàm tiếp theo đó là hàm Front Queue tương ứng với là nó sẽ trả cho chúng ta cái phần tử đang đứng ở đầu hàng đợi. 
+ Chúng ta chú ý đó là cái hàm Front Queue với cái hàm Dequeue nó khác nhau ở cái điểm là Front Queue nó chỉ trả về cho chúng ta cái phần tử đang đứng ở đầu hàng đợi mà thôi. 
+ Chứ nó không làm cái thao tác gì nữa cả. 
+ Còn cái thao tác Dequeue của chúng ta thì nó sẽ thực hiện trả về cho chúng ta cái phần tử đang đứng đầu hàng đợi và đồng thời xóa cái phần tử đó khỏi hàng đợi. 
+ Thế thì hôm trước chúng ta đã học các cái thao tác đó rồi và chúng ta có 2 cái cách có thể cài đặt đó là sử dụng mạng và sử dụng danh sách liên kết. 
+ Ngoài ra thì chúng ta có thể sử dụng cái thư viện có sẵn SDN trong đó là cái thư viện Queue. 
+ Nó hỗ trợ cho chúng ta cái cấu trúc dữ liệu hàng đợi. 
+ Các cái hàm mà nó cung cấp sẵn chúng ta có thể sử dụng mà 
+ Không cần phải tiến hành tự mình cài đặt cái cấu trúc dữ liệu hàng đợi. 
+ Giờ chúng ta sẽ sang cái phần tiếp theo đó là thực hiện một số các cái ứng dụng có ở trong cái hàng đợi. 
+ Cái ứng dụng đầu tiên đó là nhận diện xem một sâu có phải là palindrome hay không. 
+ Thì cái phần cái ứng dụng mà nhận diện xem một sâu có phải là palindrome hay không thì chúng ta cũng đã học ở trong cái chương 2. 
+ Và chúng ta giải quyết cái bài toán này bằng thuật toán đệ quy. 
+ Nhớ lại cái sâu được gọi là palindrome khi mà chúng ta đọc nó từ trái sang phải giống như là đọc nó từ phải sang trái. 
+ Các cái sâu sau đây đều được coi là sâu có tính chất palindrome. 
+ Ví dụ như sâu nun chúng ta thấy đọc từ trái sang phải cũng như đọc nó từ phải sang trái. 
+ Hay là madam cũng vậy đọc nó từ trái sang phải cũng giống như là đọc nó từ phải sang trái. 
+ Thế cái bài mà giải quyết cho một cái sâu đầu vào và xác định xem nó có cái tính chất palindrome hay không chúng ta đã thực hiện cài đặt ở trong chương 2 đó là áp dụng cái thuật toán đệ quy. 
+ Thì bây giờ chúng ta đã học thêm cái cấu trúc dữ liệu đó là hàng đợi và ngăn xếp rồi. 
+ Thì chúng ta hoàn toàn có thể giải quyết bài toán này bằng cách sử dụng 2 cái cấu trúc dữ liệu là ngăn xếp và hàng đợi. 
+ Chúng ta nhìn thấy đó là cái việc mà đọc từ trái sang phải cũng giống như đọc từ phải sang trái nó cũng sẽ áp dụng được dựa trên cái tính chất của hàng đợi và ngăn xếp. 
+ Nếu như hàng đợi là theo tính chất first in first out đó là vào trước thì ra trước thì ngăn xếp chúng ta nhớ nó hoạt động theo tính chất là lIFO tức là vào sau nhưng lại đi ra trước. 
+ Như vậy ở đây chúng ta sẽ thực hiện xác định một sâu có tính chất palindrome hay không bằng cách sử dụng đồng thời cả một cái hàng đợi vừa sử dụng hàng đợi mà vừa sử dụng ngăn xếp. 
+ Đây là đầu hàng đợi front là đầu hàng đợi, rear là cuối hàng đợi. 
+ Thế bây giờ chúng ta sử dụng cả ngăn xếp và hàng đợi thì chúng ta sẽ thực hiện như thế nào để xác định một sâu có phải là palindrome hay không. 
+ Ví dụ chúng ta có sâu đầu vào là madam. 
+ Thế thì các bạn nhìn thấy đó là chúng ta sẽ tiến hành lần lượt đưa các cái ký tự của cái sâu của chúng ta cần kiểm tra vào đồng thời cả cái hàng đợi và cả cái ngăn xếp. 
+ Thế thì đầu tiên madam mà đi vào ngăn xếp thì chúng ta duyệt từ trái sang phải. 
+ Các bạn thấy trong hàng đợi chữ M sẽ là chữ, chữ M ở phía bên trái này sẽ là chữ đầu tiên được vào hàng đợi. 
+ Sau đó chúng ta sẽ cho thêm chữ A vào hàng đợi đó là cái chữ thứ 2 trong cái sâu madam này. 
+ Tiếp theo cái chữ thứ 3 đó là chữ D chúng ta sẽ cho vào hàng đợi. 
+ Cái chữ thứ 4 là chữ A tiếp theo chúng ta sẽ cho vào hàng đợi. 
+ Và cuối cùng cái chữ M ở cuối cùng nó sẽ được xếp ở cuối cùng hàng đợi. 
+ Hoàn toàn tương tự chúng ta cũng lại duyệt từ trái sang phải và đưa nó vào trong ngăn xếp giống như vừa rồi chúng ta đưa nó vào hàng đợi. 
+ Vậy chữ M đầu tiên ở bên trái này sẽ được đưa vào trong hàng đợi. 
+ Sau đó đến cái chữ A thứ 2 sẽ được à xin lỗi đưa vào ngăn xếp. 
+ Chữ A tiếp theo sẽ được đưa vào ngăn xếp. 
+ Chữ M là cái chữ thứ, xin lỗi chữ D là cái chữ thứ 3 sẽ được đưa vào ngăn xếp. 
+ Sau đó là đến chữ A và cuối cùng đó là cái chữ M cuối cùng nằm trong cái sâu madam này sẽ được đưa vào trong hàng đợi. 
+ Thế thì sau khi mà chúng ta đã đưa lần lượt tất cả các cái phần tử ở trong hàng đợi thế thì các bạn nhìn thấy rất là rõ. 
+ Cái chữ M đang đứng ở đầu hàng đợi này chính là cái chữ M cuối cùng. 
+ Để cô xoá đi để chúng ta nhìn rõ hơn. 
+ Vì là tính chất của hàng đợi và ngăn xếp nó ngược nhau tương ứng với là first in với cả first out. 
+ Thế nên là các bạn nhìn thấy ở đây, cái chữ M mà đang đứng đầu ngăn xếp chính là cái chữ M đứng ở cái vị trí cuối cùng ở trong cái sâu ký tự của chúng ta. 
+ Còn cái chữ M mà đang đứng ở đầu của cái hàng đợi này chính là cái chữ M đang đứng ở đầu sâu. 
+ Thế thì như vậy là chúng ta sẽ thực hiện lần lượt cái thao tác xóa phần tử khỏi hàng đợi và xóa phần tử khỏi ngăn xếp. 
+ Cái phần tử đang đứng đầu hàng đợi tương ứng với phần tử đầu tiên của cái sâu ký tự. 
+ Còn ngược lại cái phần tử đang đứng đầu ngăn xếp lại tương ứng với cái phần tử đang đứng ở cuối của cái sâu ký tự. 
+ Vậy chúng ta cứ lần lượt thực hiện các cái thao tác xóa một phần tử khỏi hàng đợi và ngăn xếp. 
+ Chúng ta sẽ lần lượt so sánh với nhau. 
+ Đầu tiên chúng ta lấy xóa cái chữ M đang đứng ở đầu hàng đợi và xóa cái chữ M đang đứng ở đầu ngăn xếp đi. 
+ Chúng ta so sánh 2 cái ký tự này với nhau thì không khác gì là chúng ta so sánh ký tự đầu tiên và cái ký tự cuối cùng của cái sâu của chúng ta. 
+ Vậy nó bằng nhau. 
+ Vậy chúng ta sẽ tiếp tục so sánh cái ký tự thứ 2 và cái ký tự thứ 4 trong cái sâu chúng ta đang cần kiểm tra ạ. 
+ Vậy có nghĩa là chúng ta lại thực hiện thao tác xóa cái phần tử đang đứng đầu hàng đợi và xóa cái phần tử đang đứng ở đầu ngăn xếp. 
+ Chúng ta so sánh với nhau. 
+ Ở những lúc này là 2 cái chữ A so sánh với nhau tương ứng với là cái ký tự thứ 2 và cái ký tự thứ 4 ở trong hàng đợi và à 
+ Ở trong cái sâu ký tự chúng ta so sánh với nhau. 
+ Hoàn toàn tương tự rồi chúng ta sẽ so sánh với D với A với M. 
+ Chúng ta làm lần lượt như vậy chúng ta thấy là nó đều là bằng nhau. 
+ Như vậy kết thúc tất cả các cái phần tử ở trong ngăn xếp và hàng đợi đều đã được lần lượt lấy ra và so sánh với nhau. 
+ Và chúng ta thấy là nó đều trùng nhau. Do đó cái sâu ký tự của chúng ta nó là cái sâu palindrome. 
+ Còn nếu như mà chỉ cần 1 cái ký tự, 1 cặp ký tự mà khác nhau thì ngay lập tức chúng ta sẽ kết luận là cái sâu của chúng ta không phải là sâu palindrome. 
+ Như vậy đây là 1 cái ứng dụng rất là dễ để cho các bạn nhìn thấy được cái sự khác nhau giữa last in, first out và first in, first out. 
+ Của cái ngăn xếp và của cái hàng đợi. 
+ Rồi chúng ta sang cái ứng dụng thứ 2. 
+ Có thể kể tới của cái hàng đợi đó là chuyển đổi cái sâu chữ số sang cái sâu thập phân, sang số thập phân. 
+ Ví dụ chúng ta xét cái dãy chữ số đó là chữ số 2, chữ số 3, chữ số 5, chữ số 7. 
+ Bây giờ chúng ta đang có 1 dãy chữ số là 2, 3, 5, 7. 
+ Chúng ta cần phải chuyển cái dãy chữ số gồm có 4 chữ số, chữ số 2, chữ số 3, chữ số 5, chữ số 7 này. 
+ Về thành là 1 cái số thập phân. 
+ Như vậy số thập phân chúng ta chuyển về nó sẽ thành là 2357. 
+ Vậy làm như thế nào để tính được cái giá trị 2357 chúng ta thấy rất là đơn giản. 
+ Chúng ta sẽ duyệt lần lượt và chúng ta sẽ nhân dần lên với 10. 
+ Như vậy là chúng ta sẽ có thể tính ra được cái chữ số, dãy chữ số trở thành là 1 cái số thập phân. 
+ Thế thì cái việc này chúng ta thấy là làm rất là đơn giản. 
+ Chúng ta sẽ đẩy lần lượt các cái chữ số vào trong cái hàng đợi. 
+ Và sau đó thì chúng ta cứ lấy lần lượt các chữ số ra. 
+ Mỗi lần lấy cái chữ số đó ra thì chúng ta nhân thêm với cả 10. 
+ Như vậy chúng ta sẽ có được cái giá trị cuối cùng là 2357. 
+ Như vậy ở đây chúng ta đầu tiên chúng ta thử lấy ví dụ với 2357 này là cái sâu chữ số. 
+ Vậy chúng ta sẽ đẩy nó vào trong hàng đợi. 
+ Các bạn nhìn thấy đó là chữ số 2 sẽ đi vào trước, sau đó đến chữ số 3, sau đó đến chữ số 5. 
+ Và cuối cùng là chữ số 7. 
+ Vậy đầu tiên chúng ta lấy cái chữ số 2 ra khỏi hàng đợi. 
+ Thế thì chúng ta sẽ nhân nó. 
+ Ở đây chúng ta sẽ nhân, ờ chúng ta lấy n đầu tiên n bằng 0. 
+ Chính là cái kết thúc thì chúng ta sẽ có n. 
+ Chính là phải là trong tình huống này nó sẽ phải là cái 2300, cái giá trị 2357. 
+ Vậy khởi tạo ban đầu chúng ta sẽ có n bằng 0. 
+ Thế thì sau đó thì chúng cứ mỗi một lần mà chúng ta thực hiện cái thao tác Dequeue thì chúng ta sẽ làm cái công việc đó là lấy n. 
+ Gán lại thành là 10 nhân với n cộng với cái số nguyên mà cái ký tự CH chúng ta vừa lấy ra khỏi hàng đợi. 
+ Thế thì ở đây trong tình huống này đầu tiên n bằng 0 khi lấy cái ký tự 2 ra thì n sẽ là bằng 10 nhân với 0 cộng với cả 2. 
+ Sau đó chúng ta lấy 3 ra thì chúng ta sẽ lại lấy thành là n bằng 10 nhân với n cộng với số nguyên mà cái ký tự CH đang biểu diễn trong tình huống này là 3. 
+ Như vậy n trong cái bước lúc nãy của chúng ta chính là 2, bây giờ sẽ thành là 2 nhân 10 rồi cộng với 3. 
+ Và cứ mỗi một lần thì chúng ta lại thực hiện cái thao tác là n bằng với cả 10 nhân n cộng với số nguyên mà cái ký tự chúng ta vừa lấy ra khỏi hàng đợi biểu diễn. 
+ Và cứ làm như vậy thì chúng ta kết thúc chúng ta sẽ khi mà hàng đợi của chúng ta rỗng tức là chúng ta đã lấy ra được lần lượt tất cả các cái chữ số trong cái sâu chữ số của chúng ta. 
+ Và giá trị cuối cùng chúng ta sẽ có được chắc chắn là n bằng 2.357. 
+ Thế thì đấy là cái cách, đấy là một cái ví dụ rất là đơn giản để cho các bạn nhìn thấy cái ứng dụng của hàng đợi nó là như thế nào. 
+ Về sau các bạn đọc học ở trong toán rời rạc các bạn cũng có thể nhìn thấy rất là nhiều các cái thuật toán khác nhau mà ở trong cái đồ thị nó cũng áp dụng với hàng đợi để có thể, hàng đợi cũng như là ngăn xếp để có thể tiến hành cài đặt các cái thuật toán giải quyết các cái bài toán ở trên đồ thị. 
+ Ngoài ra thì còn rất là nhiều các cái ứng dụng khác mà ngăn xếp và hàng đợi có thể là có thể được sử dụng để cài đặt các cái thuật toán khác nhau. 
+ Như vậy là chúng ta kết thúc cái chương số 3 các cái cấu trúc dữ liệu cơ bản. 
+ Và các bạn nhớ là trong cái chương này chúng ta học tất cả là 5 cái cấu trúc dữ liệu cơ bản mà bản ghi danh sách liên kết, ngăn xếp và hàng đợi. 
+ Trong đó 3 cái quan trọng nhất là mở rộng hơn cả đó là danh sách liên kết, ngăn xếp và hàng đợi. 
+ Thì ờ như vậy là chúng ta kết thúc cái chương số 3 các cấu trúc dữ liệu cơ bản. 
+ Giờ chúng ta sẽ chuyển sang cái chương thứ 4, nó là cây. 
+ Thế thì thế nào được gọi là cây? 
+ Thì cây đó chính là một cái cấu trúc dữ liệu nâng cao và nó có các cái thành phần gì ở trong cây thì chúng ta sẽ học ở trong cái chương số 4. 
+ Và cái cây này thì nó có các cái ứng dụng giải quyết các cái bài toán, các cái dạng như thế nào và các cái thao tác gì người ta thường hay thực hiện ở trên cây. 
+ Thì chúng ta sẽ chuyển sang cái chương tiếp theo đó là chương số 4, cây. 
+ Cô ơi, bao giờ thi đấy ạ? 
+ Buổi hôm nay chúng ta sẽ thi? 
+ Mấy giờ thì ạ? 
+ Chúng ta sẽ thi trong 30 phút. 
+ Nhưng mà ý em là mấy giờ thi đấy ạ? 
+ Cô chưa biết là mấy giờ chúng ta học rồi cô sẽ căn thời gian. 
+ Em muốn biết cụ thể mấy giờ để làm gì? 
+ Tại chỗ em nó đang mất điện. 
+ Bây giờ đang mất điện nhỉ? 
+ Vâng. 
+ Thế thì khi nào thi mà vẫn mất điện thì em cần phải thông báo ngay với cô biết nhé. 
+ Trước khi thi cô điểm danh một lượt. 
+ Rồi chúng ta sẽ chuyển sang cái chương tiếp theo đó là chương cây. 
+ Đầu tiên là chúng ta sẽ vào cái phần thứ nhất đó là định nghĩa và các cái khái niệm có ở trên cây. 
+ Sau đó thì chúng ta sẽ học sang cái phần thứ hai đó là biểu diễn cây. 
+ Tức là chúng ta sẽ tiến hành cài đặt cây ở trên máy tính như thế nào. 
+ Chương thứ ba chúng ta sẽ học cái thao tác duyệt cây. 
+ Và cái chương thứ tư đó là học một cái cây đặc biệt là cây nhị phân có các cái ứng dụng trong thực tế rất là nhiều. 
+ Bây giờ rồi đầu tiên chúng ta sẽ vào phần thứ nhất đó là định nghĩa và các cái khái niệm trên cây. 
+ Thế thì đầu tiên thế nào được gọi là cây? 
+ Thế thì có thể nói cây là một cái cấu trúc dữ liệu mà trong đó thì nó sẽ chứa một tập các cái nút. 
+ Như các bạn nhìn thấy ở trên slide đây là một cái cây. 
+ Và mỗi một cái hình chữ nhật ở đây tương ứng với là một cây. 
+ À xin lỗi tương ứng là một nút có ở trong cây. 
+ Như vậy cây của chúng ta nó sẽ gồm có rất là nhiều các cái nút khác nhau. 
+ Mà trong các cái nút này thì có một cái nút đặc biệt ở đây trong tình huống này. 
+ Đây chính là cái nút đặc biệt. 
+ Và cái nút này được gọi là nút gốc. 
+ Và vì có rất là nhiều các cái cây do đó mà sẽ phải có các cái cạnh để nối các cái nút này lại với nhau. 
+ Ví dụ như từ nút gốc chúng ta nhìn thấy là nó sẽ có các cái cạnh nối ra cái nút tên là Honey Beer. 
+ Và nối ra cái nút có tên là Brandy. 
+ Rồi từ cái Honey Beer chúng ta thấy Honey Beer chúng ta thấy là nó sẽ rẽ ra có các cái cạnh để nối tới hai cái nút tiếp theo như các bạn nhìn thấy ở trên là. 
+ Thế thì có thể nói là cây là một cái cấu trúc dữ liệu mà gồm có một tập các cái nút. 
+ Mà trong đó thì có một cái nút đặc biệt mà tôi gọi nó là nút gốc. 
+ Và tiếng Anh nó chính là Root. 
+ Và sẽ có các cái cạnh để nối các cái nút lại với nhau. 
+ Thế thì đấy là định nghĩa về ờ về bằng lời là như vậy. 
+ Còn chúng ta có thể định nghĩa một cái cách toán học theo cái phương pháp đệ quy. 
+ Đó là tại cái bước cơ sở thì cái cây của chúng ta là một cái cây rỗng. 
+ Sẽ nó không có một cái nút nào cả. 
+ Và bước tiếp theo nó chính là một cái cây mà chỉ có duy nhất một nút. 
+ Đó là cái nút với ký hiệu là R. 
+ Và nút R này được gọi là nút gốc của cây. 
+ Sau đó thì chúng ta sẽ sang cái bước đệ quy. 
+ Tại bước đệ quy chúng ta giả sử chúng ta có lần lượt các cái cây đó là T1, T2, TK. 
+ Như các bạn nhìn thấy ở trên slide. 
+ Chúng ta có K cái cây như thế này. 
+ Và cái cây đầu tiên là cái cây T1 sẽ có cái nút gốc là R1. 
+ Cái cây T2 sẽ có nút gốc là R2. 
+ Vân vận. 
+ Cái cây TK sẽ có nút gốc là RK. 
+ Và sau đó thì chúng ta sẽ tiến hành xây dựng một cái cây mới từ K cái cây này và cái nút gốc R bằng cách nào? 
+ Đó là chúng ta sẽ đặt cái nút gốc, chúng ta sẽ đặt cái nút R là cha của tất cả các cái nút R1, R2, vân vân, RK. 
+ Thế khi mà chúng ta nói là tôi đặt cái nút R này trở thành cha của K cái nút R1, R2, RK. 
+ Có nghĩa là từ cái nút R này chúng ta sẽ tiến hành thực hiện các cái cạnh nối lần lượt R với R1, R với R2, vân vân, R với RK. 
+ Như vậy là chúng ta vừa mới tạo ra được một cái cây mới mà trong đó cái cây này có thêm cái nút đó là nút R và nó nối với K cái cây đã cho. 
+ Vậy cái nút R này được gọi là cái nút gốc của cây, cây, cái nút gốc R này sẽ có K cái cây con lần lượt là cây con T1, cây con T2, vân vân, cây con TK. 
+ Cây con T1 có nút gốc là R1, cây con T2 có nút gốc là R2, vân vân, cây con TK có nút gốc là RK. 
+ Thế thì đây là cái cây con thứ nhất của cái nút gốc R và vì là có cái cạnh nối trực tiếp từ R tới R1, do đó R1 này được gọi là con của cái nút R. 
+ Hoặc là chúng ta nói ngược lại R là cha của nút R1. 
+ Hoàn toàn tương tự với cái nút R2 chúng ta thấy là có cái cạnh nối trực tiếp từ R tới R2, do đó R2 được gọi là con của R hoặc chúng ta có thể nói ngược lại R là cha của R2. 
+ Tương tự với RK cũng vậy. 
+ Như vậy chúng ta nhìn thấy đó là với cái cách vẽ như thế này thì R chính là cha của các cái nút R1, R2, vân vân tới RK hoặc là nói ngược lại nút R1, nút R2, vân vân tới nút RK là con của cái nút R. 
+ Thì đấy chính là cái cách mà định nghĩa đệ quy khi xây dựng cái cấu trúc dữ liệu cây. 
+ Thì có thể nói là có rất là nhiều các cái ứng dụng khác nhau của cây, ví dụ như là sử dụng cây để biểu diễn lịch thi đấu cây gia phả vân vận. 
+ Chúng ta sẽ lấy một số các cái ví dụ tiêu biểu. 
+ Ví dụ như ở đây, đây là một cái cây và cái cây này được sử dụng để mô tả cái lịch thi đấu trong các cái giải thể thao với hình thức là thi đấu loại trực tiếp. 
+ Các bạn nhìn thấy ở trong cái cây này thì Italia này chính là gốc của cây. 
+ Và nhìn ở đây thì có nghĩa là Italia chính là cái đội vô địch trong cái giải thi đấu này. 
+ Và trong cái trận chung kết thì chính là Pháp đấu với cả Italia. 
+ Và lần lượt thì các cái nhánh ở cái phía dưới này như vậy là cái giải đấu à cái lượt đấu đầu tiên thì sẽ tương ứng với đó chính là Pháp đấu với Tây Ban Nha và Pháp thắng cho nên là đi lên cái phía trên này. 
+ Cái trận đấu thứ hai là Brazil đấu với cả Anh và Brazil thắng vậy nó đi lên như thế này vân vân
+ Thì đây là một cái ví dụ rất là đơn giản để nhìn thấy đó là cây có thể sử dụng để biểu diễn cái biểu đồ lịch thi đấu. 
+ Cái thứ hai nữa đó là có thể sử dụng cây để biểu diễn các cái cây gia phả. 
+ Ví dụ như đây là cái cây ra phả của các cái nhà toán học thuộc cùng cái dòng họ là Bernoulli. 
+ Hoặc là chúng ta có thể sử dụng cây để biểu diễn các cái thư mục ở trong máy tính của chúng ta. 
+ Chúng ta nhìn thấy là các cái thư mục con rồi các cái file con của một cái thư mục cũng nó sẽ tương ứng với là các cái nút con trong cái cây của chúng ta. 
+ Hoặc là chúng ta sử dụng cây để biểu diễn mục lục của một cái quyền sách. 
+ Ví dụ như trong cái quyền sách của chúng ta thì nó có các cái chương, chương 1, chương 2, chương 3 rồi cái phần phụ lục. 
+ Thế thì chúng ta vẽ dưới dạng cây thì đầu tiên là quyền sách của chúng ta nó sẽ có các cái con. 
+ Cái nút của đây sẽ tương ứng với là nút gốc của cây. 
+ Và nó sẽ có các cái con lượt là chương 1, chương 2, chương 3 rồi đến là cái phần phụ lục. 
+ Rồi mỗi một chương thì nó có các cái mục khác là 1.1, 1.2, 1.3 chúng ta lại vẽ ra các cái nhánh khác nhau. 
+ Thế thì đây chính là mục lục của một cái quyền sách và được biểu diễn dưới dạng cây. 
+ Và chúng ta có thể sử dụng cây để biểu diễn cây gia phả. 
+ Nhưng đây là cây gia phả ngược, hoàn toàn tương tự với cả cái cây gia phả. 
+ Cây gia phả ngược ở đây đó là thay vì tổ tiên là nút gốc thì bây giờ là chất chút chít nó lại là nút gốc. 
+ Ví dụ như trong tình huống này, đây là cây da phả ngược. 
+ Thế thì có nghĩa là chiến của chúng ta sẽ có cha với mẹ lần lượt là thanh và mai. 
+ Thế thì thanh lúc này sẽ có cha và mẹ lần lượt là giang và minh vân vân
+ Thế thì đây là cái cây gia phả ngược. 
+ Hoặc chúng ta có thể sử dụng cây để biểu diễn cái biểu thức ở trong toán học. 
+ Ví dụ như đây là một cây để biểu diễn cái biểu thức toán học đó là 1 chia 3 cộng với cả 6 nhân với 7 chia cho 4. 
+ Chúng ta cũng có thể sử dụng cây để biểu diễn sơ đồ tổ chức của một cơ quan bất kỳ. 
+ Ví dụ như ở đây là công ty máy tính MU thì nó chia ra thành các cái bộ phận bán hàng, bộ phận sản xuất, nghiên cứu và phát triển R&D vân vân 
+ Thế thì chúng ta nhìn thấy là chúng ta có thể sử dụng cái cấu trúc dữ liệu cây để lưu trữ các cái thông tin trong các cái bài toán ứng dụng thực tế. 
+ Rất là nhiều các cái ứng dụng thực tế chúng ta có thể lưu bằng cái cấu trúc dữ liệu cây. 
+ Giờ chúng ta sẽ sang cái phần thứ 2 đó là các cái thuật ngữ có ở trên cây mà người ta hay dùng. 
+ Thế thì đầu tiên đó là như lúc nãy chúng ta đã biết mỗi một cây của chúng ta sẽ là tập hợp các cái nút. 
+ Và trong đó thì sẽ có một cái nút gọi là nút gốc. 
+ Sau đó thì chúng ta có các cái nút lá, rồi con, thế nào là con, thế nào là cha, rồi tổ tiên, hậu duệ, anh em, rồi nút trong, rồi chiều cao và chiều sâu của mỗi một nút cũng như là mỗi cây. 
+ Thì chúng ta sẽ vào lần lượt các cái thuật ngữ này. 
+ Thế đầu tiên đó là cái nút ở trên cây. 
+ Nút nào trên cây được gọi là nút gốc. 
+ Thì chúng ta có định nghĩa cái nút ở trên cây mà nó không có cha ấy thì nó sẽ là nút gốc. 
+ Ví dụ như đây là một cái cây của chúng ta và trong cái cây này chúng ta thấy có nút A, nó không có cha. 
+ Chính vì vậy mà nút A được gọi là nút gốc của cây. 
+ Trong cái nút à trong cái cây này thì nút A nó có 3 cái cạnh nối trực tiếp tới nút B, nút C và nút D. 
+ Do đó nút B, nút C, nút D được gọi là con của nút A như lúc nãy chúng ta đã phân tích. 
+ Và hay nói một cách khác, nút A có, nút A là cha của 3 cái nút B, C, D. 
+ Tương tự chúng ta có là nút C, nó có cạnh nối trực tiếp tới nút G và nút H. 
+ Do đó C được gọi là cha của nút G và nút H. 
+ Hay nói ngược lại G và H là con của C. 
+ Như vậy đấy là nút gốc. 
+ Nút gốc là cái nút ở trên cây mà nó không có cha. 
+ Ví dụ như trong cái cây này thì A chính là nút gốc của cây. 
+ Tiếp theo chúng ta có khái niệm đó là anh em. 
+ Hai cái nút như thế nào được gọi là anh em của nhau. 
+ Những cái nút nào mà có cùng cha thì sẽ được gọi là anh em của nhau. 
+ Ví dụ trên cái cây này thì nút B, nút C và nút D là anh em của nhau. 
+ Tại vì nó có cùng cha đó chính là nút A. 
+ Tương tự, hoàn toàn tương tự thì chúng ta thấy đó là nút G và nút H được gọi là anh em của nhau. 
+ Vì nó có cùng cha trong tình huống này chính là nút C. 
+ Nút E và nút F cũng là anh em của nhau vì nó có cùng nút B là nút cha. 
+ Hay là I, J, K này là anh em của nhau vì nó có cùng nút cha trong tình huống này chính là nút F. 
+ Tiếp theo chúng ta có khái niệm nút trong. 
+ Nút trên cây như thế nào thì được gọi là nút trong. 
+ Thế thì chúng ta có định nghĩa nếu như nút mà có ít nhất một con thì sẽ được gọi là nút trong. 
+ Vậy ở đây trong cái cây này thì chúng ta nhìn thấy những cái nút nào mà nó có ít nhất một con nó sẽ được gọi là nút trong. 
+ Thế thì ở đây chúng ta thấy là các cái nút mà màu xanh dương tức là nút A, nút B, nút C và nút F. 
+ Nó đều có ít nhất một con ở trên cây do đó những nút này được gọi là nút trong. 
+ Tiếp theo chúng ta có khái niệm nút ngoài hay còn gọi là nút lá ở trên cây. 
+ Thế thì những cái nút mà không có con thì nó sẽ được gọi là nút lá hay còn gọi là nút ngoài ở trên cây. 
+ Thế thì các bạn nhớ là khi các bạn đọc trong các tài liệu tiếng Anh, nút ngoài thì nó là external, node hoặc là nó là nút lá, leaf. 
+ Thì những cái nút mà không có con ở trên cây thì các bạn nhìn thấy trong tình huống này chính là cái nút màu xanh lá cây. 
+ Nút E, nút I, nút J, nút G, nút H, nút K đều không có con. 
+ Do đó nó được gọi là nút lá của cái cây đã cho hay nó còn gọi là nút ngoài. 
+ Tương tự chúng ta có cái khái niệm như thế nào được gọi là tổ tiên của một nút. 
+ Thế thì những cái nút mà là nút cha, nút ông bà, nút cụ sẽ chính là được gọi là tổ tiên của cái nút đó. 
+ Ví dụ như ở đây chúng ta có nút E chẳng hạn. 
+ Thế thì tổ tiên của nó chính là nút B và nút A. 
+ Vì B thì là cha còn A thì là ông của nó. 
+ Vậy B và A được gọi là tổ tiên của E. 
+ Tiếp theo chúng ta có hậu duệ của một nút. 
+ Thế thì chính là các cái nút con, cháu chất của nút đó thì được gọi là hậu dệ của nó. 
+ Tiếp theo chúng ta có khái niệm cây con của một nút. 
+ Thế thì nó chính là cái cây mà có gốc chính là con của nút đó. 
+ Chúng ta lấy ví dụ, chúng ta lấy ví dụ như ở đây trong tình huống này, nút A. 
+ Câu hỏi đặt ra đó là những cái cây nào được gọi là cây con của nút A. 
+ Thế thì các bạn nhìn thấy theo định nghĩa cây con của nút A là cái cây mà có gốc là con của nút đó. 
+ Vậy ở đây các bạn nhìn thấy đó là ví dụ như ở đây chúng ta thấy nút A 
+ có 3 con là B, C, D. 
+ Vậy chúng ta thấy là cái cây này, cái cây mà gồm có 3 nút đó là C, G, H. 
+ Cái cây này có nút gốc là nút C mà nút C lại là con của nút A. 
+ Do đó cái cây gồm có 3 nút, C, G, H này có thể nói nó là một cây con của nút A. 
+ Ngoài ra chúng ta còn có một cái cây con khác của nút A, đó là cái cây bên phía tay trái này. 
+ Cái cây này gồm có tất cả các nút đó là B, E, F, I, Z, K. 
+ Tại sao cái cây này được gọi là cây con của nút A? 
+ Vì gốc của cái cây này chính là nút B mà nút B lại là con của nút A. 
+ Do đó cái cây hoàn toàn ở bên trái gồm có các nút B, E, F, I, J, K này được gọi là cây con của cái nút A. 
+ Tương tự với cả bên, phía bên tay phải trong cùng chúng ta thấy cái cây duy nhất ở bên này là đó là cái cây chỉ có duy nhất một nút đó là nút D. 
+ Cây này được gọi là cây con của cái nút A. 
+ Thế bây giờ chúng ta có các cái thuật ngữ đó rồi. 
+ Bây giờ các bạn lấy giấy ra và làm cho cô cái bài tập ví dụ ở phía dưới. 
+ Hãy liệt kê cho cô đâu là con của B, nút nào trên cái cây này là con của nút B. 
+ Tiếp theo, cha của nút E là nút nào trên cái cây này. 
+ Những nút nào được gọi là tổ tiên của F, những nút nào được gọi là hậu duệ của nút B. 
+ Chúng ta nhìn thấy trong cái này thì con của B, những cái nút à những cái nút nào mà có cái cạnh nối trực tiếp tới B. 
+ Từ B xuống thì nó là con của nút B. 
+ Trong tình huống này chúng ta thấy chỉ có duy nhất hai cái nút đó là nút E và nút F. 
+ Có cái cạnh nối trực tiếp từ B xuống cho đó E và F được gọi là con của B. 
+ Tiếp theo đó là cha của nút E. 
+ Chúng ta thấy là từ E chúng ta có cái cạnh nối trực tiếp đi lên nút B. 
+ Do đó cha của nút E chính là nút B. 
+ Tiếp theo đó là tổ tiên của F. 
+ Thì như lúc nãy ta nói tổ tiên của một nút tức là cha rồi ông bà ở trên, cụ của nó ở trên. 
+ Như vậy ở đây tổ tiên của F chúng ta thấy đó chính là nút B và nút A. 
+ Tiếp theo đó là hậu duệ của nút B. 
+ Thì các bạn nhìn thấy hậu duệ trong tình huống này chính là E, F là con của nó rồi I, J, K là cháu của nó. 
+ Như vậy hậu duệ của nút B sẽ là lần lượt là E, F, I, J, K. 
+ Tiếp theo chúng ta có cái thuật ngữ đó là đường đi. 
+ Đường đi trên một cái cây đó là một dãy, các cái nút và các cái cạnh nối, một nút đến các cái hậu duệ của nó. 
+ Tiếp theo chúng ta có khái niệm là độ dài của đường đi. 
+ Độ dài của đường đi theo định nghĩa chính là cái số lượng cạnh có ở trên đường đi đó. 
+ Hoặc chúng ta đếm theo số nút thì nó sẽ chính là số lượng nút trên đường đi đó rồi trừ đi 1. 
+ Chúng ta lấy ví dụ đường đi từ đỉnh A tới đỉnh C, rồi C tới E. 
+ Thế thì cái đường đi này chúng ta thấy có độ dài bằng 2 vì nó đi qua 2 cạnh, lần lượt là cạnh AC và cạnh CE. 
+ Còn nếu như đếm theo cái công thức số lượng nút thì rõ ràng là nó đi qua 3 nút A, C, E. 
+ Vậy độ dài của nó sẽ là 3 trừ 1 bằng 2. 
+ Vậy chúng ta tính theo số lượng cạnh hay tính theo số lượng đường đi trừ đi 1, chúng ta đều ra được độ dài của cái đường đi. 
+ Như vậy cái độ dài, cái đường đi mà có độ dài bằng 0 thì chính là đường đi từ 1 nút tới chính nó. 
+ Tiếp theo chúng ta có khái niệm về cái độ dài, à xin lỗi, có khái niệm về cái mức của 1 nút hay còn gọi là độ sâu của 1 nút. 
+ Thế thì định nghĩa độ sâu của 1 cái nút tôi ký hiệu là N, chính là bằng 1 cộng với độ dài đường đi từ gốc tới cái nút đó. 
+ Thế thì từ cái định nghĩa đấy thì chúng ta có thể tính được độ sâu của lần lượt các cái nút có ở trên cây. 
+ Ví dụ như cô cho cái cây như ở trên slide, yêu cầu đó là hãy xác định độ sâu của mỗi nút hay còn gọi là mức của mỗi nút. 
+ Thế thì đầu tiên chúng ta sẽ xác định cái nút A. 
+ Thế thì độ dài đường đi ở đây trong tình huống này đó là nút A, chúng ta sẽ có là cái độ sâu của nó chính là 1. 
+ Tại sao là vậy? Tại vì theo công thức nó sẽ chính là 1 cộng với độ dài đường đi từ gốc tới nó. 
+ Và các bạn nhìn thấy ở đây trong tình huống này nó chính là nút gốc. 
+ Vậy độ dài từ nút gốc tới chính nó theo lúc nãy là bằng 0. 
+ Rồi chúng ta cộng với 1 do đó độ sâu của cái nút gốc trong tình huống này luôn luôn nó sẽ là bằng  
+ 1 theo đúng định nghĩa. 
+ Tương tự độ sâu của nút B chúng ta thấy theo công thức là sẽ bằng 1 cộng với độ dài đường đi từ gốc tới nó. 
+ Vậy từ A tới B độ dài của đường đi này chính là 1 rồi cộng thêm 1 nữa do đó nút B có độ sâu là 2. 
+ Tương tự nút C và nút D cũng đều có độ sâu là 2 hay còn gọi là mức của nút B, nút C, nút D, mức của chúng đều là bằng 2. 
+ Tương tự chúng ta sẽ có nút E và nút F sẽ có độ sâu lần lượt là 3 và hay còn gọi là mức của nó là 3. 
+ Như vậy chúng ta có khái niệm về độ sâu cũng như là mức của 1 nút. 
+ Tiếp theo chúng ta có khái niệm chiều cao của 1 nút. 
+ Thế thì chiều cao của 1 nút theo 1 nút tôi ký hiệu là N, chính là bằng 1 cộng với độ dài cái đường đi dài nhất từ N đến lá. 
+ Thế thì chúng ta sẽ có được trong tình huống này lần lượt các nút lá của chúng ta đều sẽ có chiều cao là 1 theo đúng như cái định nghĩa về chiều cao của 1 nút ở trên cây. 
+ Sau đó chúng ta sẽ tính chiều cao của lần lượt các nút còn lại. 
+ Đầu tiên đó là nút C. 
+ Chúng ta thấy chiều cao của nút C là chính bằng 1 cộng với độ dài đường đi dài nhất từ nó tới lá. 
+ Thế thì chúng ta thấy nút C đến lá ở đây trong tình huống này đó là nút E với cả nút F bằng 2. 
+ Và tương tự chúng ta sẽ có chiều cao của cái nút A của chúng ta sẽ là 3. 
+ Như vậy các bạn nhớ là chiều sâu thì chúng ta tính từ trên xuống, còn chiều cao thì chúng ta tính từ dưới lên. 
+ Tất cả các cái nút lá thì đều có chiều cao là 1 rồi sau đó chúng ta cứ cộng dần lên để chúng ta sẽ có được cái chiều cao của lần lượt các nút còn lại. 
+ Cuối cùng đó là chúng ta có chiều cao hay còn gọi là chiều sâu của cây. 
+ Thế thì chiều cao hay chiều sâu của cây thì chúng ta theo định nghĩa nó sẽ chính là bằng chiều cao của cái nút gốc. 
+ Vậy nếu như cái cây của chúng ta như thế này thì chiều cao của cây này sẽ chính là chiều cao của nút gốc A và do đó nó sẽ chính là bằng 3. 
+ Hoặc là chúng ta có thể theo định nghĩa đó là chiều cao lớn nhất của tất cả các cái nút ở trên cây. 
+ Rõ ràng nút gốc thì luôn luôn là cái nút có chiều cao lớn nhất ở trên cây. 
+ Do đó mà chúng ta cũng có thể định nghĩa trực tiếp đó là chiều cao của nút gốc. 
+ Ví dụ như cái cây các bạn nhìn thấy ở trên slide thì chúng ta họ xem là chiều sâu và chiều cao của lần lượt các cái nút ở trên cây là bao nhiêu. 
+ Thế thì các bạn nhớ là chiều sâu thì chúng ta luôn luôn tính từ trên xuống lần lượt xuống dưới và chiều cao thì chúng ta sẽ tính lần lượt từ dưới lên trên. 
+ Thế thì chiều cao của cái cây này chúng ta thấy nó chính là chiều cao của cái nút gốc trong tình huống này nó chính là bằng 7. 
+ Các bạn nhớ là tất cả các cái nút lá trên cây đều có chiều cao là 1. 
+ Vậy nút 9 này có chiều cao là 1, nút 6 này, nút 1 này, nút 2 này, nút 11, nút 12 đều có chiều cao là 1. 
+ Rồi dần dần chúng ta sẽ cộng cha lên dần dần chúng ta sẽ có các chiều cao của các cái nút còn lại. 
+ Tiếp theo chúng ta có cái thuật ngữ về bậc của 1 nút ở trên cây. 
+ Thế thì bậc của 1 nút theo định nghĩa sẽ chính là số lượng nút con của nó. 
+ Và bậc của 1 cây theo định nghĩa sẽ là bậc lớn nhất của tất cả các cái nút trên cây. 
+ Chúng ta sẽ lần lượt xét các nút có ở trên cây. 
+ đầu tiên đó là nút A. Hỏi rằng bậc của nút A là bao nhiêu? 
+ Thế thì các bạn nhìn thấy đó là nút A có 2 con đó là B và C. 
+ Do đó bậc của nút A là bằng 2. 
+ Tương tự nút B chúng ta thấy nó có 2 con là E và F. 
+ Do đó bậc của nút B là bằng 2. 
+ Nút C chúng ta thấy nó có 3 con đó là G, H và D. 
+ Do đó bậc của nút C là 3. 
+ Chúng ta thấy nút E là nút lá. 
+ Nó không có con nào cả. 
+ Do đó bậc của nút E của chúng ta là bằng 0. 
+ Nút F chúng ta thấy nó có 3 con là I, J, K. 
+ Do đó bậc của nút F là 3. 
+ Tương tự tất cả các cái nút còn lại G, H, D, I, J, K đều là các nút lá trên cây. 
+ Tức là nó không có con. 
+ Do đó bậc của nó đều là bằng 0. 
+ Theo đúng như định nghĩa. 
+ Vậy câu hỏi đặt ra bậc của cây là bao nhiêu? 
+ Các bạn nhìn thấy trong cái tình huống này. 
+ Theo đúng định nghĩa bậc của cây đó là bậc lớn nhất của tất cả các nút có ở trên cây. 
+ Vậy trên cây này bậc lớn nhất chính là cái nút C với cả nút E có bậc lớn nhất là 3. 
+ Do đó bậc của cây này là bằng 3 theo đúng như định nghĩa. 
+ Các bạn làm cho cô cái bài tập thứ 2 và các bạn viết vào giấy cho cô. 
+ Có bạn nào có thể trả lời luôn được cái bài tập này không? 
+ Để Cộng điểm giữa kỳ luôn không? 
+ Dạ em ạ. 
+ Bùi Duy chiến. 
+ Bùi Duy chiến cô. 
+ Bùi Duy Chiến chiến? 
+ Cô thấy Nguyễn Ngọc Linh dơ tay đầu tiên này. 
+ Dạ vâng. 
+ Số nút ở cây này là 9 ạ. 
+ 9 rồi. 
+ nút gốc ở lút A. 
+ Các nút lá là C, D, F, H, I. 
+ C này, D này, F, H, I 
+ các nút trong là A, B, E, G 
+ A, B, E, G, rồi 
+ nút tổ tiên của H là G, E, B, A 
+ Rồi G, E, B, A rồi
+ Con cháu của B là D, E, F, G, H, I 
+ rồi D, E, F, G, H, I rồi
+ Anh em của E là D và F ạ 
+ Rồi, D và F 
+ Cây con phải của A là cây B ạ 
+ Chúng ta không thể nói cây con phải của A là cây B được 
+ Nói như thế nào 
+ Là có cây có nút gốc là B ạ 
+ Cái cây con phải của B là cái cây gồm có các nút là B, D, E, G, H, I 
+ Rồi, mà trong đó B là nút gốc không có 
+ Nếu như các bạn vẽ ở đây thì các bạn phải vẽ lại cái cây đó ra như thế này 
+ Rồi, cây con trái 
+ Đấy là cây con trái của A chứ 
+ à vâng Đấy là cây con trái của A ạ
+ Cây con phải của nút A 
+ Đúng rồi, cây con trái của A 
+ Đây mới là cây con trái 
+ Đây là cây con trái của A này 
+ Cây con phải của A là cây nào 
+ Chỉ có nút C rồi 
+ Đúng rồi, cái cây con phải của A là cái cây 
+ Có duy nhất một nút đó là nút C 
+ Vậy Đây là con phải, cây con phải 
+ Nó ở bên phải thì chúng ta gọi là cây con phải 
+ Nó nằm bên trái ta gọi là cây con trái 
+ Rồi, chiều cao của cây này là bao nhiêu? 
+ Nằm vào năm ạ 
+ Năm à? 
+ Một, hai, ba, bốn 
+ Rồi, đúng rồi, bậc của cây 
+ Bậc của cây là ba ạ 
+ Rồi, bậc của cây là ba ạ 
+ Rồi 
+ Nguyễn Ngọc Linh đúng không nhỉ? 
+ Vâng ạ 
+ Như vậy nói vui thì các bạn có thể 
+ Tưởng tượng từ nãy giờ chúng ta học cây 
+ Chúng ta đều vẽ từ cái gốc rồi 
+ Chúng ta chĩa xuống dưới các cái nhánh 
+ Các cái lá nó nằm ở dưới 
+ Cho nên người ta mới hay có cái hình ảnh vui 
+ Như các bạn nhìn thấy ở trên slide 
+ Về cây tự nhiên thì chúng ta thấy là 
+ Luôn luôn gốc nó nằm ở dưới rồi 
+ Các cái lá nó tỏa lên phía trên 
+ Tuy nhiên thì các nhà khoa học máy tính 
+ Thì nhìn cây theo cái dạng đó là lộn ngược lại 
+ Gốc mà chúng ta treo nó ở phía trên 
+ Còn lá thì chúng ta lại đẩy nó xuống phía dưới 
+ Đây là một cái hình ảnh vui 
+ Chúng ta nhớ về cái cấu trúc dữ liệu cây 
+ Chúng ta đã học 
+ Tiếp theo chúng ta có cái khái niệm 
+ Đó là cây có thứ tự 
+ Mà đọc trong các cái tài liệu tiếng Anh 
+ Đó là order tree 
+ Thế thì cái cây như thế nào 
+ Thì được gọi là cây có thứ tự 
+ Thế thì các bạn chú ý 
+ Đó là cây có thứ tự 
+ Là cái cây mà các cái nút 
+ Ở trong cây tôi sẽ quan tâm tới 
+ Cái thứ tự mà nó xuất hiện 
+ Ở trong cây 
+ Nó xuất hiện nằm bên trái 
+ Hay nó xuất hiện nằm bên phải 
+ Nó sẽ tạo ra các cái cây khác nhau 
+ Ví dụ như các bạn nhìn thấy 
+ Ở trên slide 
+ Đây là cái cây T1 
+ Gồm có 3 nút ABC 
+ Đây là một cái cây khác 
+ Cây này là cây T2 
+ Các bạn nhìn thấy 
+ Nó cũng có 3 nút là ABC 
+ Tuy nhiên nếu như 
+ T1 và T2 
+ Là cây có thứ tự 
+ Thì rõ ràng là 
+ T1 sẽ khác với T2 
+ Chứ không phải là cùng một cây 
+ Tại vì ở đây các bạn nhìn thấy 
+ Nó đều có nút gốc là A 
+ Tuy nhiên 
+ B 
+ Thì nó lại nằm bên trái của A 
+ Trong cái cây T1 
+ Còn B 
+ Ở bên cây T2 
+ Nó lại nằm bên phải của A 
+ Ở trong cái cây T2 này 
+ Như vậy nếu như 
+ T1 và T2 
+ Là cây có thứ tự 
+ Tức là các cái nút 
+ Ở trong cây được sắp xếp 
+ Theo cái thứ tự 
+ Do đó mà T1 
+ Nó sẽ khác với T2 
+ Còn nếu như T1 và T2 
+ Không phải là cây có thứ tự 
+ Thì rõ ràng là T1 bằng T2 
+ Vậy cây mà không có thứ tự 
+ Tức là chúng ta chỉ quan tâm tới là 
+ Cây có bao nhiêu nút 
+ Và mỗi một nút 
+ Có những cái con nào 
+ Chứ chúng ta không quan tâm tới 
+ Nó nằm ở theo thứ tự 
+ Bên trái hay là bên phải 
+ Thì lúc đó nó sẽ là cái 
+ Cây không có thứ tự 
+ Còn nếu như tôi quan tâm tới thứ tự 
+ Của các cái nút được sắp xếp như thế nào 
+ Ở trên cây 
+ Thì lúc đó nó sẽ phải là 
+ Cây có thứ tự 
+ Giờ chúng ta chuyển sang 
+ Cái phần thứ 2 
+ Đó là cái cách 
+ Mà biểu diễn cây 
+ Ở trên máy tính 
+ Thế thì các bạn nhìn thấy 
+ Rõ ràng đó là 
+ Như lúc nãy chúng ta đã thấy là
+ Định nghĩa 
+ Một cái cây của chúng ta 
+ Nó sẽ gồm 
+ Có là một tập hợp 
+ Các cái nút 
+ Và sẽ có các cái cạnh 
+ Nối các cái nút với nhau 
+ Để chúng ta biết được 
+ Đâu là cha 
+ Đâu là con 
+ Và đâu là cháu 
+ Chắc tổ tiên 
+ Vân vân 
+ Thế thì chúng ta sẽ phải 
+ Cài đặt cái cây 
+ Ở trên máy tính như thế nào 
+ Để chúng ta sẽ 
+ Lưu được 
+ Là cây có bao nhiêu nút 
+ Và các cái cạnh 
+ Nối giữa các cái nút 
+ Cụ thể là những cạnh 
+ Như thế nào 
+ Vậy câu hỏi đặt ra 
+ Chúng ta nên sử dụng 
+ Cái cấu trúc dữ liệu gì 
+ Để có thể 
+ Cài đặt được cây 
+ Ở trên máy tính 
+ Lưu được 
+ Bao nhiêu nút 
+ Và giữa các cái nút 
+ Sẽ có các cái cạnh 
+ Nối như thế nào 
+ Chúng ta nghỉ giải lao 
+ 10 phút 
+ Và sau đó 
+ Thì chúng ta sẽ 
+ Quay lại học tiếp 
+ Chúng ta sẽ học đến 
+ Vì chúng ta sẽ thi 
+ Trong vòng 30 phút 
+ Chúng ta 5 rưỡi đúng không 
+ 30 phút 
+ Như vậy chúng ta sẽ đến 
+ Khoảng độ 4 rưỡi 
+ Cô sẽ điểm danh 
+ Và sau đó 
+ Thì chúng ta sẽ thi 
+ 4 rưỡi chắc là sẽ kịp 
+ thi xong rồi mình học được không cô?
+ Chúng ta học tiếp nhé 
+ Giờ chúng ta sang 
+ Cái thứ 2 
+ Đó là cái cách 
+ Chúng ta cài đặt cây 
+ Ở trên máy tính 
+ Thế thì để lưu được cây 
+ Gồm có những cái nút 
+ Như thế nào 
+ Nội dung của nút 
+ Là gì 
+ Và các cái cạnh 
+ Nối giữa các cái nút 
+ Ra sao 
+ Thì chúng ta 
+ Có thể 
+ Cài đặt cây 
+ Theo một trong 
+ Các cái cách 
+ Sau đây 
+ Người ta hay dùng nhất 
+ Cái cách đầu tiên 
+ Đó là sử dụng 
+ Mảng một chiều 
+ Cách thứ 2 
+ Đó là sử dụng 
+ Danh sách các con 
+ Và cách thứ 3 
+ Đó là 
+ Lưu trữ theo kiểu 
+ Con trái nhất 
+ Anh em bên phải 
+ Giờ chúng ta vào 
+ Cái cách thứ nhất 
+ Đó là sử dụng 
+ Mảng một chiều 
+ Để cài đặt cây 
+ Thế thì chúng ta 
+ Lấy cái ví dụ 
+ Như cái cây 
+ Ở trên slide 
+ Thế thì để 
+ Cài đặt cây 
+ Theo cái cách này 
+ Thì cái bước đầu tiên 
+ Chúng ta cần làm 
+ Đó là chúng ta 
+ Sẽ đánh số 
+ Các cái cây 
+ Theo lần lượt 
+ Thứ tự 
+ Từ trên 
+ Xuống dưới 
+ Từ trái 
+ Sang phải 
+ Như vậy 
+ Cái nút gốc 
+ Sẽ được đánh 
+ Thứ tự là 1 
+ Sau đó lần lượt xuống dưới là 2, 3, 4, 5, 6, 7, 8, 9, 10 
+ Ví dụ như ở đây, cô đánh theo thứ tự bất kỳ như thế này 
+ Thế thì chúng ta sẽ lưu chữ cái cây này theo cái mảng 1 chiều như sau 
+ Đó là chúng ta lưu, đó là AI 
+ Chúng ta sẽ lưu bằng J 
+ Tức là cái phần tử thứ Y của cái mảng A sẽ bằng J
+ Nếu như J là cha của nút Y 
+ Và rõ ràng ở trên cây thì chúng ta thấy sẽ có cái nút gốc là cái nút không có cha 
+ Do đó mà A1 của chúng ta sẽ luôn luôn bằng 0 
+ Vậy ở đây chúng ta sẽ điền vào cái mảng A 1 chiều 
+ Cái cây này có tất cả là 10 phần tử 
+ Do đó cái mảng A của chúng ta sẽ có 10 phần tử lần lượt là A1 vân vân đến A10 
+ Thế thì A1 như lúc nãy đã nói 
+ Cái A1 của chúng ta sẽ chính là bằng cái nút J 
+ Mà trong đó J là cha của nút 1 
+ Tuy nhiên nút 1 là nút gốc, nó không có cha nên luôn mặc định A1 của chúng ta bằng 0 
+ Tiếp theo nút 2 và nút 3 đều có cha là nút 1 
+ Do đó A2 và A3 của chúng ta là bằng 1 
+ Tiếp theo nút 4 chúng ta thấy nút 4 và nút 5 có cha là nút 2 
+ Do đó chúng ta sẽ có là A4 và A5 của chúng ta là bằng 2 
+ Tiếp theo đó là cái nút 6 của chúng ta 
+ Các bạn thấy nút 6 của chúng ta có cha là nút 3 
+ Do đó A6 của chúng ta bằng 3 
+ Nút 7, nút 8, nút 9 của chúng ta có cha là nút 6 
+ Do đó A7, A8, A9 của chúng ta đều bằng 6 
+ Và cuối cùng đó là nút 10 
+ Nút 10 có cha là nút 3 
+ Do đó A10 của chúng ta là bằng 3 
+ Như vậy các bạn thấy đây là cái cách để chúng ta có thể lưu cái cây ở trên máy tính 
+ Và chúng ta có thể biết được cái nút cây gồm có những nút nào 
+ Và tiếp theo nữa đó là cạnh nối giữa các cái cây 
+ Cạnh nối giữa các cái nút trên cây có những cái cạnh như thế nào 
+ Thông qua xác định cha của một nút ở trên cây 
+ Chúng ta sang cái cách biểu diễn thứ 2 
+ Đó là biểu diễn theo dạng danh sách các con 
+ Vì chúng ta thấy là với một cái cây 
+ Thì mỗi một cái nút nó sẽ có tập các cái nút con của nó 
+ Vậy khi tôi lưu danh sách các con 
+ Có nghĩa là cái cây có bao nhiêu nút 
+ Thì mỗi một nút chúng ta sẽ lưu xem 
+ Nó có những cái con nào 
+ Danh sách các con của mỗi một nút ở trên cây 
+ Vậy với cái cách lưu này 
+ Thì có nghĩa là chúng ta sẽ sử dụng 
+ Một tập các cái danh sách liên kết 
+ Ở đây các bạn nhìn thấy 
+ Vẫn cái cây như ở lúc nãy 
+ Và chúng ta đánh số các cái cây 
+ Theo thứ tự lần lượt từ 1 đến 10 như vừa rồi 
+ Thế như vậy cái cây này có 10 nút 
+ Do đó chúng ta tương ứng là 
+ Sẽ có là 10 cái danh sách liên kết 
+ Danh sách liên kết thứ nhất 
+ Sẽ chứa 
+ Tất cả các cái con của cái nút 1 
+ Danh sách liên kết thứ 10 
+ Sẽ chứa tất cả các cái nút con 
+ Của cái nút 10 
+ Vậy chúng ta thấy nút 1 trên cây 
+ Có 2 nút con là nút 2 
+ Và nút 3 
+ Do đó danh sách liên kết đầu tiên này 
+ Sẽ có 2 nút đó là 2 và 3 
+ Hay như nút 6 
+ Chúng ta thấy nó có các cái con 
+ Lần lượt là 7, 8, 9 
+ Vậy cái danh sách liên kết thứ 6 của chúng ta 
+ Sẽ chứa 3 cái nút lần lượt là 7, 8, 9 
+ Vân vân 
+ Như vậy với cái cách tổ chức này 
+ Chúng ta sẽ lưu chữ header 
+ Là 1 mảng các cái con trỏ 
+ Và mỗi 1 cái header y 
+ Nó sẽ trỏ tới đầu danh sách 
+ Chứa các cái con của cái nút y 
+ Trên cái cây của chúng ta 
+ Như vậy mỗi 1 cái danh sách 
+ Các con của 1 cái nút y 
+ Ở trên cây sẽ được biểu diễn 
+ Bởi 1 cái danh sách liên kết 
+ Ví dụ như cây này có 10 nút 
+ Thì chúng ta sẽ cần phải lưu trữ 
+ 10 cái danh sách liên kết 
+ Và 1 cái mảng header gồm có 10 phần tử 
+ Mỗi 1 cái header y 
+ Sẽ trỏ vào cái nút đầu tiên 
+ Của 1 cái danh sách liên kết 
+ Chứa các cái con của cái nút y 
+ Ở trên cây 
+ Đấy là cái cách thứ 2 
+ Giờ chúng ta sang cái cách biểu diễn thứ 3 
+ Đó là theo cách đó là con trái nhất 
+ Em kế cận bên phải 
+ Đọc trong các tài liệu tiếng Anh 
+ Thì nó đề là the leftmost child 
+ Leftmost child tức là con bên trái nhất 
+ Right sibling 
+ Sibling là anh em 
+ Và right sibling tức là anh em kế cận 
+ Ở phía bên tay phải 
+ Tại sao chúng ta có thể lưu theo cái cách biểu 
+ Tại sao chúng ta có thể lưu theo cái cách biểu diễn này 
+ Vì chúng ta nhận xét đó là 
+ Mỗi 1 cái nút ở trên cây 
+ Của chúng ta 
+ Đều có thể xảy ra 
+ Ở trong 1 trong các cái tình huống sau 
+ Thứ nhất đó là nó 
+ Không có con nào 
+ Hoặc là có duy nhất 1 cái con 
+ Ở bên trái nhất 
+ Cô ơi cô mất mic rồi 
+ Hoặc là nó không có anh em nào 
+ Hoặc là có duy nhất 1 cái anh em 
+ Ở phía bên tay phải 
+ Ví dụ như các bạn nhìn thấy 
+ Ở nút B ở trên cái cây này chẳng hạn 
+ Cái nút B này các bạn nhìn thấy 
+ Cái con trái nhất của nút B 
+ Chính là cái nút E 
+ Chúng ta thấy nút B có 3 con 
+ Lần lượt là E, F và G 
+ Tuy nhiên cái con trái nhất của nút B 
+ Chính là cái nút E 
+ Và anh em bên phải 
+ Kề với nút B 
+ Chính là nút C 
+ Tương tự chúng ta có nút C 
+ Khi chúng ta xét tới cái nút C 
+ Chúng ta thấy là 
+ Nó không có con nào 
+ Và như vậy 
+ Cái con trái nhất của nút C 
+ Tương ứng với là bằng rỗng 
+ Còn anh em bên phải của nút C 
+ Thì chính là nút D 
+ Tương tự chúng ta xét 1 nút khác 
+ Ở trên cây trong tình huống này 
+ Đó là nút I 
+ Thế thì các bạn nhìn thấy 
+ Đó là nút I của chúng ta 
+ Nó không có con nào 
+ Và anh em bên phải của nó 
+ Cũng không có cái nút nào 
+ Như vậy 
+ Từ cái nhận xét 
+ Đó là mỗi một nút trên cây 
+ Thì có thể đó là 
+ Nó không có con nào 
+ Hoặc là nó có duy nhất 1 con 
+ Ở bên trái nhất 
+ Hoặc là nó không có anh em nào 
+ Hoặc là nó có duy nhất 1 anh em 
+ Ở bên tay phải 
+ Do đó mà từ đây 
+ Chúng ta sẽ biểu diễn cây 
+ Bằng cách đó là 
+ Lưu thông tin 
+ Về con trái nhất 
+ Và em kế cận bên phải 
+ Của mỗi một nút 
+ Vậy do đó chúng ta sẽ sử dụng 
+ Cái cấu trúc struct 
+ Để có thể 
+ Liêm chữ mỗi một nút 
+ Ở trên cây 
+ Đầu tiên đó là 
+ Cái phần dữ liệu của nút 
+ Dữ liệu của nút 
+ Thì tùy theo nút 
+ Tùy theo cái cây đó 
+ Được sử dụng như thế nào 
+ Mà chúng ta sẽ 
+ Biểu diễn nó 
+ Ví dụ như ở đây 
+ Cô làm đơn giản 
+ Đó là dữ liệu của cây 
+ Dữ liệu của mỗi một nút 
+ Ở trên cây là một số nguyên 
+ Sau đó thì chúng ta 
+ Sẽ cần phải 
+ Lưu xem là 
+ Cái con trái nhất 
+ Và em kế cận bên phải 
+ Của nút này là nút nào 
+ Như vậy tương ứng với việc 
+ Là chúng ta sẽ phải 
+ Có cái con trỏ 
+ Để trỏ tới 
+ Cái con trái nhất 
+ Và một cái con trỏ 
+ Để trỏ tới 
+ Cái em kế cận bên phải 
+ Vậy các bạn sẽ 
+ Khai báo 
+ Tree node 
+ Sao con trái nhất 
+ Và tree node 
+ Sao em kế cận bên phải 
+ Cái con trỏ 
+ Con trái nhất này 
+ Sẽ trỏ sang 
+ Con trái nhất 
+ Của cái nút 
+ Của chúng ta 
+ Còn cái con trỏ 
+ Em kế cận bên phải 
+ Sẽ trỏ tới 
+ Cái nút em 
+ Nằm ở khía bên phải 
+ Của cái nút của chúng ta 
+ Vậy như vậy 
+ Mỗi một nút 
+ Ở trên cây 
+ Chúng ta sẽ lưu trữ 
+ Ba thông tin 
+ Phần dữ liệu 
+ Phần con trỏ 
+ Trỏ sang con trái nhất 
+ Và phần con trỏ 
+ Trỏ sang 
+ Em kế cận bên phải 
+ Nếu như chúng ta 
+ Sử dụng 
+ Type def 
+ Chúng ta sử dụng 
+ Trong C 
+ Còn nếu như C 
+ Cộng cộng 
+ Chúng ta có thể 
+ Bỏ luôn 
+ Type def đi 
+ Chúng ta viết như bình thường 
+ Đó là struct tree node như các bạn nhìn thấy ở trên slide
+ Tùy theo chúng ta sử dụng trên C 
+ Hay C cộng cộng 
+ Chúng ta sẽ có 
+ Type def
+ Hay là không có 
+ Type def 
+ Giờ chúng ta sẽ lấy 
+ Một cái ví dụ 
+ Rất là đơn giản 
+ Đây là một cái cây 
+ Của chúng ta 
+ Và nếu như 
+ Chúng ta lưu trữ 
+ Cái cây này dưới dạng 
+ Nó là con trái nhất 
+ Em kế cận bên phải 
+ Thì chúng ta sẽ lưu như thế nào 
+ Thì đầu tiên của chúng ta 
+ Đó là cái nút A 
+ Cái phần dữ liệu 
+ Của nó 
+ Chính là A 
+ Và sau đó là 
+ Chúng ta có 2 cái con trỏ 
+ Cái con trỏ này 
+ Để trỏ sang 
+ Cái con trái nhất 
+ Của nút A 
+ Còn cái con trỏ này 
+ Được sử dụng 
+ Để trỏ sang 
+ Cái em kế cận bên phải 
+ Của nút A 
+ Thế thì chúng ta nhìn thấy 
+ Đó là nút A 
+ Có 3 con 
+ Trong tình huống này 
+ Có 3 con là 
+ B, C, D 
+ Vậy con trái nhất 
+ Của nút A 
+ Chính là nút B 
+ Do đó 
+ Cái con trỏ 
+ Trỏ sang con trái nhất 
+ Trẻ sáng 
+ Sang là nút B 
+ Nút A 
+ Chúng ta thấy 
+ Nút A là nút gốc 
+ Do đó 
+ Nó không có em 
+ Kế cận bên phải 
+ Do đó 
+ Cái con trỏ 
+ Em kế cận bên phải 
+ Của nó này 
+ Sẽ có giá trị là 
+ Null
+ Tương tự tới nút B 
+ Chúng ta thấy 
+ Con trái nhất 
+ Của nút B 
+ Chính là nút E 
+ Do đó 
+ Cái con trỏ 
+ Trỏ sang 
+ Cái con trái nhất 
+ Trên cái nút B này 
+ Sẽ phải trỏ tới 
+ Nút E 
+ Em kế cận bên phải 
+ Của nút B 
+ Chính là nút C 
+ Do đó 
+ Cái con trỏ 
+ Em kế cận bên phải này 
+ Sẽ phải trỏ sang 
+ Cái nút đó là nút C 
+ Tương tự 
+ Tương tự chúng ta làm 
+ Hoàn toàn tương tự 
+ Với lần lượt 
+ Các nút còn lại 
+ Bây giờ 
+ Nếu như chúng ta 
+ Xét tới nút C 
+ Chúng ta thấy 
+ Nó có duy nhất 
+ Một con 
+ Đó là con G 
+ Vậy 
+ Cái con trỏ 
+ Con trái nhất 
+ Ở bên cái nút C 
+ Chúng ta sẽ phải trỏ tới 
+ Nút G 
+ Nút C 
+ Có em kế cận bên phải 
+ Của nó 
+ Chính là nút D 
+ Do đó 
+ Cái con trỏ 
+ Em kế cận bên phải 
+ Của nút C 
+ Sẽ trỏ tới 
+ Nút D 
+ Chúng ta làm lần lượt 
+ Với các cái nút còn lại 
+ Chúng ta sẽ lưu được 
+ Tất cả 
+ Các cái dữ liệu 
+ Có ở trên nút 
+ Cũng như là cấu trúc 
+ Của 
+ Tất cả các cái nút 
+ Có ở trên cây 
+ Nó trỏ lần lượt 
+ Tới các cái nút tương ứng 
+ Vậy với cái cách biểu diễn 
+ Con trái nhất 
+ Em kế cận bên phải 
+ Các bạn nhìn thấy 
+ Đó là chúng ta 
+ Lưu được 
+ Ngoài cái cấu trúc 
+ Của cây 
+ Tức là lưu được 
+ Cây có những cái nút 
+ Như thế nào 
+ Và nó nối với nhau 
+ Ra sao 
+ Ngoài ra thì chúng ta 
+ Còn lưu được cả 
+ Dữ liệu 
+ Có ở trên 
+ Mỗi một nút 
+ Ở trên cây 
+ Hay như cái cây 
+ Ở phía bên tay trái 
+ Của chúng ta như thế này 
+ Trong tình huống này 
+ Thì mỗi một nút 
+ Cây 
+ Mỗi một nút dữ liệu 
+ Nó chứa một cái số nguyên 
+ Vậy chúng ta sẽ khai báo 
+ Là in data
+ sau đó chúng ta khai báo là
+ Hai cái con trỏ 
+ Con trái nhất 
+ Và em kế cận bên phải 
+ Tương ứng 
+ Và chúng ta cũng vẽ 
+ Nếu như chúng ta vẽ mô tả 
+ Chúng ta thấy 
+ Nó sẽ tương ứng với 
+ Cái cấu trúc dữ liệu 
+ Như các bạn nhìn thấy 
+ Mỗi một nút trên cây 
+ Chúng ta lưu trữ dữ liệu 
+ Và hai cái con trỏ 
+ Con trỏ thứ nhất 
+ Trỏ sang cái con trái nhất 
+ Và cái con trỏ thứ hai 
+ Trỏ sang cái em 
+ Kế cận bên phải 
+ Giờ chúng ta sang 
+ Cái phần thứ ba 
+ Đó là duyệt cây 
+ Thế thì 
+ Khi nói tới duyệt cây 
+ Thì tương ứng với việc 
+ Đó là chúng ta sẽ đi thăm 
+ Các cái nút 
+ Có ở trên cây 
+ Vậy có ba cái phương pháp 
+ Chính để duyệt cây 
+ Đó là duyệt cây 
+ Theo thứ tự trước 
+ Duyệt cây 
+ Theo thứ tự sau 
+ Và duyệt cây 
+ Theo thứ tự giữa 
+ Thì trước tiên 
+ Chúng ta sẽ vào 
+ Cái phương pháp thứ nhất 
+ Đó là duyệt cây 
+ Theo thứ tự trước 
+ Preorder
+ ờ thôi ờ
+ Chúng ta sẽ kiểm tra luôn nhé 
+ Ở bên phía cô 
+ Họ đang đục tường 
+ Nên là hơi ồn 
+ Ờ 

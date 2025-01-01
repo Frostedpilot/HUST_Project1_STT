@@ -270,7 +270,7 @@ def transcribe_wav2vec(model, signals, vad=False, stop_event=None):
 
     chunk_files = sorted(glob.glob(os.path.join(BASE_DIR, "chunks/*.wav")), key=len)
 
-    print(chunk_files)
+    # print(chunk_files)
 
     res = ""
 
