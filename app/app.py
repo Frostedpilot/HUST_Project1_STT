@@ -68,6 +68,8 @@ class MyMainWindow(QMainWindow):
         main_layout.setContentsMargins(10, 10, 10, 10)
         self.load_settings()
 
+        self.model_combobox.textChanged(0)
+
     def load_settings(self):
         self.settings.beginGroup("DeepGram")
         deepgram_api_key = self.settings.value("api_key")

@@ -87,6 +87,7 @@ class ModelComboBox(QComboBox):
                 return False
 
     def loadModel(self, text):
+        self.setEnabled(False)
         button = self.parent.transcribe_button
         button.setEnabled(False)
         button.setText("Loading Model...")
@@ -103,6 +104,7 @@ class ModelComboBox(QComboBox):
         button = self.parent.transcribe_button
         button.setEnabled(True)
         button.setText("Start")
+        self.setEnabled(True)
 
     def loadAPI(self, text, api_key):
         if text == "DeepGram":

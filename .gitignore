@@ -175,3 +175,6 @@ data/
 
 # local binary files
 app/binaries/
+
+# Inno setup output
+Output/
