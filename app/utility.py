@@ -58,6 +58,28 @@ def update_utility_base_dir(new_base_dir):
     print("Updated utility BASE_DIR:", BASE_DIR)
 
 
+def check_float16_support():
+    if not torch.cuda.is_available():
+        return False  # No CUDA, no float16 support
+
+    try:
+        # Check for CUDA capability (>= 6.0 for efficient float16)
+        major, minor = torch.cuda.get_device_capability()
+        if major < 6:
+            print(
+                f"Warning: GPU compute capability ({major}.{minor}) is below 6.0. Efficient float16 is not supported."
+            )
+            return False
+
+        # Try creating a float16 tensor on the GPU to see if it's supported
+        torch.randn(1, dtype=torch.float16, device="cuda")
+        return True
+
+    except RuntimeError as e:
+        print(f"Warning: RuntimeError when checking for float16 support: {e}")
+        return False
+
+
 def preprocess_audio(audio_path):
     os.makedirs(os.path.join(BASE_DIR, "res"), exist_ok=True)
     local_file = os.path.join(BASE_DIR, "res/audio.wav")
@@ -116,8 +138,12 @@ def check_assemblyai_api_key(api_key):
 
 def load_whisper(model_size):
     print(f"Loading OpenAI Whisper: {model_size}")
+    if check_float16_support():
+        compute_type = "float16"
+    else:
+        compute_type = "float32"
     model = WhisperModel(
-        model_size, device=settings.value("device"), compute_type="float16"
+        model_size, device=settings.value("device"), compute_type=compute_type
     )
     return model
 
