@@ -60,6 +60,7 @@ def update_utility_base_dir(new_base_dir):
 
 def check_float16_support():
     if not torch.cuda.is_available():
+        print("Warning: No CUDA device detected. Float16 support may be limited.")
         return False  # No CUDA, no float16 support
 
     try:
@@ -142,6 +143,7 @@ def load_whisper(model_size):
         compute_type = "float16"
     else:
         compute_type = "float32"
+    print(f"Using compute type: {compute_type}")
     model = WhisperModel(
         model_size, device=settings.value("device"), compute_type=compute_type
     )
