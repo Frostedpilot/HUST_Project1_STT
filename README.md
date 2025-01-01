@@ -76,6 +76,8 @@ Simply download the installer from the release page and follow the instructions.
    pip install -r requirements.txt
    ```
 
+   Install the appropriate Pytorch version (version 2.5.1, with or without cuda) from its website
+
 4. **Run the code**
    ```bash
    python3 app/app.py
