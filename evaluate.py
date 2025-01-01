@@ -177,9 +177,15 @@ def _evaluate_local(
     for model_name, model_sizes in models_to_evaluate.items():
         for model_size in model_sizes:
             print(f"Evaluating model: {model_name} ({model_size})")
-
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             log_file_path = os.path.join(log_dir, "evaluation_log.txt")
+            with open(log_file_path, "a") as log_file:
+                log_file.write(f"Model: {model_name}\n")
+                log_file.write(f"Model Size: {model_size}\n")
+                log_file.write(f"Language: {language}\n")
+                log_file.write(f"VAD: {vad}\n")
+
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                log_file.write(f"Timestamp: {timestamp}\n")
 
             if model_name == "OpenAI Whisper":
                 model = load_whisper(model_size)
@@ -193,7 +199,17 @@ def _evaluate_local(
             total_cer = 0
             num_files = 0
 
+            vtv_wer = 0
+            vtv_cer = 0
+            vtv_num_files = 0
+
+            lecture_wer = 0
+            lecture_cer = 0
+            lecture_num_files = 0
+
             for filename in os.listdir(audio_dir):
+                with open(log_file_path, "a") as log_file:
+                    log_file.write(f"File: {filename}\n")
                 if filename.endswith(".wav") or filename.endswith(".mp3"):
                     audio_path = os.path.join(audio_dir, filename)
                     transcript_path = os.path.splitext(audio_path)[0] + ".txt"
@@ -231,9 +247,22 @@ def _evaluate_local(
                             total_cer += cer
                             num_files += 1
 
+                            if "vtv" in filename:
+                                vtv_wer += wer
+                                vtv_cer += cer
+                                vtv_num_files += 1
+
+                            if "lecture" in filename:
+                                lecture_wer += wer
+                                lecture_cer += cer
+                                lecture_num_files += 1
+
                             print(
                                 f"Processed: {filename} - WER: {wer:.4f}, CER: {cer:.4f}"
                             )
+                            with open(log_file_path, "a") as log_file:
+                                log_file.write(f"WER: {wer:.4f}\n")
+                                log_file.write(f"CER: {cer:.4f}\n\n")
 
                         except Exception as e:
                             print(f"Error processing {filename}: {e}")
@@ -241,14 +270,26 @@ def _evaluate_local(
             avg_wer = total_wer / num_files if num_files > 0 else 0
             avg_cer = total_cer / num_files if num_files > 0 else 0
 
+            avg_vtv_wer = vtv_wer / vtv_num_files if vtv_num_files > 0 else 0
+            avg_vtv_cer = vtv_cer / vtv_num_files if vtv_num_files > 0 else 0
+
+            avg_lecture_wer = (
+                lecture_wer / lecture_num_files if lecture_num_files > 0 else 0
+            )
+            avg_lecture_cer = (
+                lecture_cer / lecture_num_files if lecture_num_files > 0 else 0
+            )
+
             # Log the results to a file
             with open(log_file_path, "a") as log_file:
-                log_file.write(f"Model: {model_name}\n")
-                log_file.write(f"Model Size: {model_size}\n")
-                log_file.write(f"Language: {language}\n")
-                log_file.write(f"Timestamp: {timestamp}\n")
                 log_file.write(f"Average WER: {avg_wer:.4f}\n")
                 log_file.write(f"Average CER: {avg_cer:.4f}\n")
+                if vtv_num_files > 0:
+                    log_file.write(f"Average WER (VTV): {avg_vtv_wer:.4f}\n")
+                    log_file.write(f"Average CER (VTV): {avg_vtv_cer:.4f}\n")
+                if lecture_num_files > 0:
+                    log_file.write(f"Average WER (Lecture): {avg_lecture_wer:.4f}\n")
+                    log_file.write(f"Average CER (Lecture): {avg_lecture_cer:.4f}\n")
                 log_file.write("*" * 50 + "\n")
 
             print(
@@ -266,9 +307,13 @@ def _evaluate_api(
 ):
     for model_name, api_key in models_to_evaluate.items():
         print(f"Evaluating model: {model_name}")
-
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         log_file_path = os.path.join(log_dir, "evaluation_log.txt")
+        with open(log_file_path, "a") as log_file:
+            log_file.write(f"Model: {model_name}\n")
+            log_file.write(f"Language: {language}\n")
+
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            log_file.write(f"Timestamp: {timestamp}\n")
 
         if model_name == "Deepgram":
             client = DeepgramClient(api_key)
@@ -280,7 +325,17 @@ def _evaluate_api(
         total_cer = 0
         num_files = 0
 
+        vtv_wer = 0
+        vtv_cer = 0
+        vtv_num_files = 0
+
+        lecture_wer = 0
+        lecture_cer = 0
+        lecture_num_files = 0
+
         for filename in os.listdir(audio_dir):
+            with open(log_file_path, "a") as log_file:
+                log_file.write(f"File: {filename}\n")
             if filename.endswith(".wav") or filename.endswith(".mp3"):
                 audio_path = os.path.join(audio_dir, filename)
                 transcript_path = os.path.splitext(audio_path)[0] + ".txt"
@@ -313,7 +368,20 @@ def _evaluate_api(
                         total_cer += cer
                         num_files += 1
 
+                        if "vtv" in filename:
+                            vtv_wer += wer
+                            vtv_cer += cer
+                            vtv_num_files += 1
+
+                        if "lecture" in filename:
+                            lecture_wer += wer
+                            lecture_cer += cer
+                            lecture_num_files += 1
+
                         print(f"Processed: {filename} - WER: {wer:.4f}, CER: {cer:.4f}")
+                        with open(log_file_path, "a") as log_file:
+                            log_file.write(f"WER: {wer:.4f}\n")
+                            log_file.write(f"CER: {cer:.4f}\n\n")
 
                     except Exception as e:
                         print(f"Error processing {filename}: {e}")
@@ -321,13 +389,26 @@ def _evaluate_api(
         avg_wer = total_wer / num_files if num_files > 0 else 0
         avg_cer = total_cer / num_files if num_files > 0 else 0
 
+        avg_vtv_wer = vtv_wer / vtv_num_files if vtv_num_files > 0 else 0
+        avg_vtv_cer = vtv_cer / vtv_num_files if vtv_num_files > 0 else 0
+
+        avg_lecture_wer = (
+            lecture_wer / lecture_num_files if lecture_num_files > 0 else 0
+        )
+        avg_lecture_cer = (
+            lecture_cer / lecture_num_files if lecture_num_files > 0 else 0
+        )
+
         # Log the results to a file
         with open(log_file_path, "a") as log_file:
-            log_file.write(f"Model: {model_name}\n")
-            log_file.write(f"Language: {language}\n")
-            log_file.write(f"Timestamp: {timestamp}\n")
             log_file.write(f"Average WER: {avg_wer:.4f}\n")
             log_file.write(f"Average CER: {avg_cer:.4f}\n")
+            if vtv_num_files > 0:
+                log_file.write(f"Average WER (VTV): {avg_vtv_wer:.4f}\n")
+                log_file.write(f"Average CER (VTV): {avg_vtv_cer:.4f}\n")
+            if lecture_num_files > 0:
+                log_file.write(f"Average WER (Lecture): {avg_lecture_wer:.4f}\n")
+                log_file.write(f"Average CER (Lecture): {avg_lecture_cer:.4f}\n")
             log_file.write("*" * 50 + "\n")
 
         print(
@@ -353,8 +434,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--log_dir",
         type=str,
-        default="evaluation_logs",
-        help="Directory to save evaluation logs (default: evaluation_logs)",
+        default="data/evaluation_logs",
+        help="Directory to save evaluation logs (default: data/evaluation_logs)",
     )
     parser.add_argument(
         "--model_size",
