@@ -160,9 +160,9 @@ cython_debug/
 #.idea/
 
 # Any kind of audio files generated during development
-# *.mp3
-# *.flac
-# *.wav
+*.mp3
+*.flac
+*.wav
 
 # API keys
 secret.json
@@ -171,7 +171,7 @@ secret.json
 packenv/
 
 # the evaluation data
-# data/
+data/
 
 # local binary files
 app/binaries/
