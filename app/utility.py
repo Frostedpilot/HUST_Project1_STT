@@ -11,6 +11,7 @@ import httpx
 import torchaudio
 import soundfile as sf
 import assemblyai as aai
+from pathlib import Path
 from transformers import (
     SpeechEncoderDecoderModel,
     AutoFeatureExtractor,
@@ -266,7 +267,10 @@ def transcribe_wav2vec(model, signals, vad=False, stop_event=None):
         audio_path = os.path.join(BASE_DIR, "speech.wav")
 
     chunk_and_decode_wav(audio_path, os.path.join(BASE_DIR, "chunks"))
-    chunk_files = sorted(glob.glob(os.path.join(BASE_DIR, "chunks/*.wav")))
+
+    chunk_files = sorted(glob.glob(os.path.join(BASE_DIR, "chunks/*.wav")), key=len)
+
+    print(chunk_files)
 
     res = ""
 
