@@ -22,8 +22,8 @@ This application is a speech-to-text (STT) system developed as part of the Proje
     - OpenAI Whisper (various sizes: Tiny, Base, Medium, Large and Turbo)
     - Facebook Wav2Vec 2.0 (only Vietnamese model for now)
   - API-based models:
-    - Deepgram
-    - AssemblyAI
+    - [Deepgram](https://developers.deepgram.com/)
+    - [AssemblyAI](https://www.assemblyai.com/docs/)
 - **Language Support:**
   - English
   - Vietnamese
@@ -36,15 +36,11 @@ This application is a speech-to-text (STT) system developed as part of the Proje
 ### Prerequisites
 
 - **Python 3.12+:** Ensure you have Python 3.12 or a later version installed on your system.
-- **FFmpeg (Optional):** This is required for audio processing. Although the binaries for both `ffmpeg` and `ffprobe` are provided with the installer, it is still recommended to install FFmpeg and add the binaries to PATH to avoid errors.
-- **Git (Optional):** To clone the repository, you'll need Git installed.
+- **FFmpeg (Optional):** This is required for audio processing. Although the binaries for both `ffmpeg` and `ffprobe` are provided with the installer, it is required to install FFmpeg and either add the binaries to PATH or copy the binaries to the `app/binaries/` folder if you want to work with the source code. You can download FFmpeg from the official website: https://ffmpeg.org/download.html
+- **Git (Optional):** To clone the repository, you'll need Git installed. You can download Git from: https://git-scm.com/downloads
 - **Required Python Packages:** The required packages are listed in `requirements.txt`.
 
 ### Installation
-
-#### Use the installer
-
-Simply download the installer from the release page and follow the instructions.
 
 #### Use the code directly
 
@@ -59,15 +55,19 @@ Simply download the installer from the release page and follow the instructions.
 
 2. **Create and Activate a Virtual Environment (Recommended):**
 
-   ```bash
-   # Using venv (recommended)
-   python3 -m venv packenv
-   .venv\Scripts\activate
+   Using venv (recommended)
 
-   # Or using virtualenv (if you prefer)
+   ```bash
+   python3 -m venv packenv
+   .\packenv\Scripts\activate
+   ```
+
+   Or using virtualenv (if you prefer)
+
+   ```bash
    pip install virtualenv
    virtualenv packenv
-   .venv\Scripts\activate
+   .\packenv\Scripts\activate
    ```
 
 3. **Install Dependencies:**
@@ -76,7 +76,7 @@ Simply download the installer from the release page and follow the instructions.
    pip install -r requirements.txt
    ```
 
-   Install the appropriate Pytorch version (version 2.5.1, with or without cuda) from its website
+   And install the appropriate Pytorch version (version 2.5.1, with or without cuda) from its website: https://pytorch.org/get-started/locally/
 
 4. **Run the code**
    ```bash
@@ -96,21 +96,26 @@ Simply download the installer from the release page and follow the instructions.
 
 2. **Create and Activate a Virtual Environment (Recommended):**
 
-   ```bash
-   # Using venv (recommended)
-   python3 -m venv packenv
-   .venv\Scripts\activate
+   Using venv (recommended)
 
-   # Or using virtualenv (if you prefer)
+   ```bash
+   python3 -m venv packenv
+   .\packenv\Scripts\activate
+   ```
+
+   Or using virtualenv (if you prefer)
+
+   ```bash
    pip install virtualenv
    virtualenv packenv
-   .venv\Scripts\activate
+   .\packenv\Scripts\activate
    ```
 
 3. **Install Dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
+   And install the appropriate Pytorch version (version 2.5.1, with or without cuda) from its website: https://pytorch.org/get-started/locally/
 4. **Build the executable:**
 
    ```bash
@@ -121,12 +126,19 @@ Simply download the installer from the release page and follow the instructions.
 
 ### API Keys
 
-To use the Deepgram and AssemblyAI models, you need to obtain API keys from their respective websites. Refer to their respective websites for instructions.
+To use the Deepgram and AssemblyAI models, you need to obtain API keys from their respective websites. Refer to their respective websites for instructions:
+
+- Deepgram: https://developers.deepgram.com/
+- AssemblyAI: https://www.assemblyai.com/docs/
 
 ## Usage
 
 1. **Launch the Application:**
    - Run the executable file created by PyInstaller.
+   - Or run the command:
+   ```bash
+   python3 app/app.py
+   ```
 2. **Select a Model:**
    - Choose the desired transcription model from the "Model" dropdown menu.
    - If using a local model, select the model size (e.g., "tiny," "base," "medium").
@@ -143,6 +155,21 @@ To use the Deepgram and AssemblyAI models, you need to obtain API keys from thei
    - Access the "Settings" menu to configure API keys, default models, and other preferences.
 
 ## Troubleshooting
+
+- **Error: 'charmap' codec can't decode byte...**
+  - This error indicates an encoding issue with your ground truth text files. Make sure the text files are encoded in UTF-8. You can change the encoding using a text editor like Notepad.
+- **Application stops without error when loading local model.**
+  - This is likely due to insufficient memory (RAM or GPU VRAM). Try closing unnecessary programs, using a smaller model, split the audio into smaller chunks or use the API-based models instead of local models.
+- **Error: `Requested float16 compute type, but the target device or backend do not support efficient float16 computation.`**
+  - This means your hardware or software backend doesn't fully support `float16` precision. The application will automatically switch to `float32` in this case. While this ensures the application runs, local models will run slower and potentially have slightly lower accuracy. If speed is critical, you might need to upgrade your hardware or use API-based models.
+- **Other notes:**
+  - While the models are capable of processing audio longer than 2 hours, you might experience significant delays when using audio files longer than 1 hour. This is because preprocessing audio for local models and uploading audio data for API-based models can take a very long time, and network issues may arise. For a smoother experience, it is recommend using audio up to 1 hour long.
+  - The Whisper and Wav2Vec2 models are by default downloaded to the `C:\Users\YourUserName\.cache\huggingface\hub\` folder. If you want to delete the local model files, go to that folder and delete any folder that has `wav2vec` or `whisper` in their name
+  - Larger Whisper models can use up a lot of GPU VRAM. For referenced, my NVIDIA GeForce RTX 3050Ti Mobile 4GB can barely handle Whisper Turbo, and the only model that it can't run is the Whisper Large model.
+  - When building the .exe file and the Windows installer, Windows Defender will flag the app as Trojan. This is false positive, as can be inspected from the source code, there is no malicious code injected.
+  - The console when using built exe file can be turned off by setting `console=False` in the `EXE` class in `app.spec` file. Note that doing this can further trigger Windows Defender.
+- **Other Issues:**
+  - If you encounter any other issues, please check the [GitHub Issues](https://github.com/Frostedpilot/HUST_Project1_STT/issues) page to see if the problem has already been reported. If not, please open a new issue and provide as much detail as possible, including error messages, operating system, and steps to reproduce the problem.
 
 ## Future Works
 
